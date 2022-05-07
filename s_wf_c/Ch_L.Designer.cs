@@ -53,38 +53,35 @@
             // 
             // txtPort
             // 
-            this.txtPort.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.txtPort.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtPort.BackColor = System.Drawing.Color.White;
             this.txtPort.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.txtPort.Location = new System.Drawing.Point(154, 34);
             this.txtPort.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtPort.Name = "txtPort";
             this.txtPort.PlaceholderText = "1236";
-            this.txtPort.Size = new System.Drawing.Size(62, 19);
+            this.txtPort.Size = new System.Drawing.Size(62, 26);
             this.txtPort.TabIndex = 8;
             // 
             // txtUser
             // 
-            this.txtUser.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.txtUser.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtUser.BackColor = System.Drawing.Color.White;
             this.txtUser.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.txtUser.Location = new System.Drawing.Point(27, 68);
             this.txtUser.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtUser.Name = "txtUser";
             this.txtUser.PlaceholderText = "test 1";
-            this.txtUser.Size = new System.Drawing.Size(189, 19);
+            this.txtUser.Size = new System.Drawing.Size(189, 26);
             this.txtUser.TabIndex = 7;
             // 
             // txtHost
             // 
-            this.txtHost.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.txtHost.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtHost.BackColor = System.Drawing.Color.White;
             this.txtHost.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.txtHost.Location = new System.Drawing.Point(27, 34);
             this.txtHost.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtHost.Name = "txtHost";
             this.txtHost.PlaceholderText = "127.0.0.1";
-            this.txtHost.Size = new System.Drawing.Size(123, 19);
+            this.txtHost.Size = new System.Drawing.Size(123, 26);
             this.txtHost.TabIndex = 6;
             // 
             // errorProvider
@@ -111,7 +108,10 @@
             this.Controls.Add(this.txtUser);
             this.Controls.Add(this.txtHost);
             this.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Ch_L";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Login";

@@ -6,24 +6,25 @@ using System.Threading.Tasks;
 using Socket.Messages;
 using Socket.Client;
 using Socket.Server;
+using Socket.DTO;
 
 namespace Socket.Channel
 {
     public class Channel
     {
 
-        public static List<Channel> AllChannels { get; set; } = new List<Channel>();
+        public static List<Channel> All { get; set; } = new List<Channel>();
 
         public static Channel CreateChannel(string name, SocketS server)
         {
-            if (Channel.AllChannels.Any(d => d.Name.ToLower().Trim() == name.ToLower().Trim()))
+            if (Channel.All.Any(d => d.Name.ToLower().Trim() == name.ToLower().Trim()))
             {
                 throw new Exceptions.ChannelException($"Channel {name} already exists");
             }
 
             Channel ch = new Channel(name, server);
 
-            AllChannels.Add(ch);
+            All.Add(ch);
 
             return ch;
         }
@@ -37,22 +38,27 @@ namespace Socket.Channel
             }
             catch { }
 
-            Channel curr = Channel.AllChannels.Where(d => d.Name == chgN).First();            
+            Channel curr = Channel.All.Where(d => d.Name == chgN).First();            
                        
 
             curr.Add(socket);
 
-            if (!String.IsNullOrEmpty(pre) && Channel.ChannelExists(pre))
+            if (!String.IsNullOrEmpty(pre) && pre != chgN && Channel.ChannelExists(pre))
             {
-                Channel prevC = Channel.AllChannels.Where(d => d.Name == pre).First();
+                Channel prevC = Channel.All.Where(d => d.Name == pre).First();
                 prevC.Remove(socket);
+                prevC.InformNewUserLeaving(socket);
+
+                if (prevC._clients.Count == 0)
+                    Channel.DeleteChannel(prevC.Name);
+                
             }
                 
 
             Message msg = new Message { DateTime = DateTime.Now, From = Configurations.Config.ServerName, FGUID = Configurations.Config.ServerGUID };
             msg.Channel = curr.Name;
             msg.Header = Headers.CHANGE_CHANNEL;
-            msg.ChannelsParts = curr.Participants.Select(d => new UserMessageDTO { GUID = d.GUID, Name = d.UserName }).ToList();           
+            msg.ChannelsParts = curr.Participants.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList();           
 
             socket.SendMessage(msg);
 
@@ -63,17 +69,17 @@ namespace Socket.Channel
 
         public static bool ChannelExists(string name)
         {
-            return Channel.AllChannels.Any(d => d.Name.ToLower().Trim() == name.ToLower().Trim());
+            return Channel.All.Any(d => d.Name.ToLower().Trim() == name.ToLower().Trim());
         }
 
         public static void DeleteChannel(string name)
         {
-            if (!Channel.AllChannels.Any(d => d.Name.ToLower().Trim() == name.ToLower().Trim()))
+            if (!Channel.All.Any(d => d.Name.ToLower().Trim() == name.ToLower().Trim()))
             {
                 throw new Exceptions.ChannelException($"Channel {name} not exists");
             }
 
-            AllChannels.RemoveAll(d => d.Name.ToLower().Trim() == name.ToLower().Trim());
+            All.RemoveAll(d => d.Name.ToLower().Trim() == name.ToLower().Trim());
 
         }
 
@@ -81,11 +87,14 @@ namespace Socket.Channel
         {
             if (Channel.ChannelExists(socketC.Channel))
             {
-                Channel curr = Channel.AllChannels.Where(d => d.Name == socketC.Channel).First();
+                Channel curr = Channel.All.Where(d => d.Name == socketC.Channel).First();
 
                 curr.Remove(socketC);
 
                 curr.InformNewUserLeaving(socketC);
+
+                if (curr._clients.Count == 0)
+                    Channel.DeleteChannel(curr.Name);
             }
         }
 
@@ -158,7 +167,7 @@ namespace Socket.Channel
 
         public void BroadCast(Message codMsg, SocketC sender = null)
         {
-            codMsg.ChannelsParts = _clients.Select(d => new UserMessageDTO { GUID = d.GUID.Trim(), Name = d.UserName }).ToList();
+            codMsg.ChannelsParts = _clients.Select(d => new UserDTO { GUID = d.GUID.Trim(), Name = d.UserName }).ToList();
             codMsg.Channel = this.Name;
 
             List<SocketC> tgts = _clients;
@@ -187,7 +196,7 @@ namespace Socket.Channel
             };
 
 
-           co.ChannelsParts = _clients.Select(d => new UserMessageDTO { GUID = d.GUID, Name = d.UserName }).ToList();
+           co.ChannelsParts = _clients.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList();
 
             foreach (SocketC sc in _clients)
             {

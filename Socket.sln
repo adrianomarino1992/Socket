@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "sC_test", "sC_test\sC_test.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cS_test", "cS_test\cS_test.csproj", "{1559DBE2-CAFB-4DDE-8853-846FFCCD10E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "s_wf_c", "s_wf_c\s_wf_c.csproj", "{33B90CE1-1EEE-4252-A63F-E305F4C28E26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "s_wf_c", "s_wf_c\s_wf_c.csproj", "{33B90CE1-1EEE-4252-A63F-E305F4C28E26}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DA49326C-51AF-4903-9ED2-47DDB3CE78E0}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

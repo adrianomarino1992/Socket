@@ -1,5 +1,7 @@
-﻿using Socket.Messages;
+﻿using Socket.DTO;
+using Socket.Messages;
 using System.Net.Sockets;
+using Socket.Messages.Body;
 using System.Security.Permissions;
 
 namespace Socket.Client
@@ -15,7 +17,8 @@ namespace Socket.Client
         public event Action<SocketC> OnDisconnected;
         public event Action<Exception> OnConnectionFail;
         public event Action<Message, SocketC> OnChannelChanged;
-        public event Action<List<UserMessageDTO>, string, SocketC> OnPartsOfChannelUpdated;
+        public event Action<RequestChannelsInfoBody, SocketC> OnReceiveChannelsInfo;
+        public event Action<List<UserDTO>, string, SocketC> OnPartsOfChannelUpdated;
         public event Action<bool, DateTime> OnConnectionCheckedAsync;
 
         internal event Action<Message, SocketC> OnMessageArriveFromClient;
@@ -193,6 +196,14 @@ namespace Socket.Client
             SendMessage(message);
         }
 
+        public void RequestAllChannels()
+        {
+            Message message = m_crMessage("get all");
+            message.Channel = _channel;
+            message.Header = Headers.GET_ALL_CHANNEL;
+            SendMessage(message);
+        }
+
         public void ChangeChannel(string chnName)
         {
             Message message = m_crMessage("change channel");
@@ -349,6 +360,9 @@ namespace Socket.Client
             if (!m_PartsChannelUp(msg))
                 return false;
 
+            if (!m_reqAllChannels(msg))
+                return false;
+
             return true;
         }
 
@@ -388,6 +402,19 @@ namespace Socket.Client
             return true;
         }
 
+
+        private bool m_reqAllChannels(Message msg)
+        {
+            if (msg.Header == Headers.GET_ALL_CHANNEL)
+            {                
+                OnReceiveChannelsInfo?.Invoke(msg.Body.FromJson<RequestChannelsInfoBody>(), this);
+
+                return false;
+            }
+
+            return true;
+        }
+
         private bool m_changeChanel(Message msg)
         {
             if (msg.Header == Headers.CHANGE_CHANNEL)
@@ -395,6 +422,8 @@ namespace Socket.Client
                 _channel = msg.Channel;
 
                 OnChannelChanged?.Invoke(msg, this);
+
+                return false;
             }
 
             return true;

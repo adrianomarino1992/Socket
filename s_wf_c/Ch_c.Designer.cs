@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Ch_c));
             this.lvMsg = new System.Windows.Forms.ListBox();
             this.lvlUser = new System.Windows.Forms.ListBox();
             this.txtMsg = new System.Windows.Forms.TextBox();
@@ -35,10 +36,16 @@
             this.lblUser = new System.Windows.Forms.Label();
             this.lblChannel = new System.Windows.Forms.Label();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.btnRequestChannels = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.btnRequestChannels)).BeginInit();
             this.SuspendLayout();
             // 
             // lvMsg
             // 
+            this.lvMsg.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvMsg.BackColor = System.Drawing.Color.White;
             this.lvMsg.FormattingEnabled = true;
             this.lvMsg.ItemHeight = 18;
             this.lvMsg.Location = new System.Drawing.Point(10, 50);
@@ -49,6 +56,9 @@
             // 
             // lvlUser
             // 
+            this.lvlUser.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvlUser.BackColor = System.Drawing.Color.White;
             this.lvlUser.FormattingEnabled = true;
             this.lvlUser.ItemHeight = 18;
             this.lvlUser.Location = new System.Drawing.Point(746, 50);
@@ -59,6 +69,9 @@
             // 
             // txtMsg
             // 
+            this.txtMsg.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtMsg.BackColor = System.Drawing.Color.White;
             this.txtMsg.Location = new System.Drawing.Point(10, 461);
             this.txtMsg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtMsg.Multiline = true;
@@ -70,6 +83,7 @@
             // 
             // btnSend
             // 
+            this.btnSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSend.BackColor = System.Drawing.Color.DeepSkyBlue;
             this.btnSend.ForeColor = System.Drawing.Color.White;
             this.btnSend.Location = new System.Drawing.Point(746, 463);
@@ -92,15 +106,18 @@
             // 
             // lblChannel
             // 
+            this.lblChannel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblChannel.AutoSize = true;
             this.lblChannel.Location = new System.Drawing.Point(746, 18);
             this.lblChannel.Name = "lblChannel";
             this.lblChannel.Size = new System.Drawing.Size(47, 18);
             this.lblChannel.TabIndex = 5;
             this.lblChannel.Text = "Channel";
+            this.lblChannel.Click += new System.EventHandler(this.lblChannel_Click);
             // 
             // lblStatus
             // 
+            this.lblStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblStatus.AutoSize = true;
             this.lblStatus.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 9.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lblStatus.ForeColor = System.Drawing.Color.DarkGray;
@@ -110,12 +127,28 @@
             this.lblStatus.TabIndex = 6;
             this.lblStatus.Text = "Checking connection ...";
             // 
+            // btnRequestChannels
+            // 
+            this.btnRequestChannels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRequestChannels.BackColor = System.Drawing.Color.DeepSkyBlue;
+            this.btnRequestChannels.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnRequestChannels.Image = ((System.Drawing.Image)(resources.GetObject("btnRequestChannels.Image")));
+            this.btnRequestChannels.Location = new System.Drawing.Point(885, 16);
+            this.btnRequestChannels.Name = "btnRequestChannels";
+            this.btnRequestChannels.Padding = new System.Windows.Forms.Padding(4);
+            this.btnRequestChannels.Size = new System.Drawing.Size(22, 22);
+            this.btnRequestChannels.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.btnRequestChannels.TabIndex = 7;
+            this.btnRequestChannels.TabStop = false;
+            this.btnRequestChannels.Click += new System.EventHandler(this.btnRequestChannels_Click);
+            // 
             // Ch_c
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(921, 541);
+            this.Controls.Add(this.btnRequestChannels);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.lblChannel);
             this.Controls.Add(this.lblUser);
@@ -125,8 +158,11 @@
             this.Controls.Add(this.lvMsg);
             this.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.MinimumSize = new System.Drawing.Size(937, 580);
             this.Name = "Ch_c";
             this.Text = "Chat";
+            this.Load += new System.EventHandler(this.Ch_c_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.btnRequestChannels)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -141,5 +177,6 @@
         private Label lblUser;
         private Label lblChannel;
         private Label lblStatus;
+        private PictureBox btnRequestChannels;
     }
 }

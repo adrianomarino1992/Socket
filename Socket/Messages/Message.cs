@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using Socket.DTO;
 
 namespace Socket.Messages
 {
@@ -18,7 +19,7 @@ namespace Socket.Messages
         public string TGUID { get; set; }
         public string Channel { get; set; }
 
-        public List<UserMessageDTO> ChannelsParts { get; set; } = new List<UserMessageDTO>();
+        public List<UserDTO> ChannelsParts { get; set; } = new List<UserDTO>();
 
         public Message() { }
 
@@ -35,11 +36,5 @@ namespace Socket.Messages
 
     }
 
-    public class UserMessageDTO 
-    {
-        public string Name { get; set; }
-        public string GUID { get; set; }
-
-        public UserMessageDTO() { }
-    }
+    
 }

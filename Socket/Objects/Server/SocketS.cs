@@ -5,6 +5,7 @@ using Socket;
 using Socket.Messages.Body;
 using Socket.Client;
 using Socket.Channel;
+using Socket.DTO;
 
 namespace Socket.Server
 {
@@ -53,7 +54,7 @@ namespace Socket.Server
                 throw new Exceptions.SocketException($"The message must be a valid text");
 
 
-            Socket.Channel.Channel.AllChannels.ForEach(d => d.BroadCast(codMsg, socket));
+            Socket.Channel.Channel.All.ForEach(d => d.BroadCast(codMsg, socket));
            
         }
 
@@ -97,7 +98,7 @@ namespace Socket.Server
             if (!m_checkPrivMssg(codMsg, socketC))
                 return;
 
-            Socket.Channel.Channel cliChannel = Socket.Channel.Channel.AllChannels.FirstOrDefault(d => d.Contains(socketC));
+            Socket.Channel.Channel cliChannel = Socket.Channel.Channel.All.FirstOrDefault(d => d.Contains(socketC));
 
             if (cliChannel != null)
             {
@@ -132,20 +133,52 @@ namespace Socket.Server
                 return false;
             }
 
+            if (codMsg.Header == Headers.GET_ALL_CHANNEL)
+            {
+
+                m_sendAllPesChl(codMsg, socketC);
+
+                return false;
+            }
+
 
             return true;
         }
 
+        private void m_sendAllPesChl(Message chgN, SocketC socket)
+        {
+            Socket.Channel.Channel ch = Socket.Channel.Channel.All.Where(d => d.Contains(socket)).FirstOrDefault();
+
+            if (ch == null)
+                return;
+
+            RequestChannelsInfoBody body = new RequestChannelsInfoBody();
+            body.Channels = new List<ChannelDTO>();
+            body.Channels = Channel.Channel.All.Select(d => new ChannelDTO { Name = d.Name, Users = d.Participants.Select(p => new UserDTO { Name = p.UserName, GUID = p.GUID }).ToList() }).ToList();
+
+            Message msg = new Message
+            {
+                ChannelsParts = ch.Participants.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList(),
+                Channel = ch.Name,
+                Header = Headers.GET_ALL_CHANNEL,
+                Body = body.ToJson()
+                
+            };
+
+            socket.SendMessage(msg);
+
+        }
+
         private void m_sendPesChl(Message chgN, SocketC socket)
         {
-            Socket.Channel.Channel ch = Socket.Channel.Channel.AllChannels.Where(d => d.Contains(socket)).FirstOrDefault();
+            Socket.Channel.Channel ch = Socket.Channel.Channel.All.Where(d => d.Contains(socket)).FirstOrDefault();
 
             if (ch == null)
                 return;
 
             Message msg = new Message
             {
-                ChannelsParts = ch.Participants.Select(d => new UserMessageDTO { GUID = d.GUID, Name = d.UserName }).ToList(),
+                ChannelsParts = ch.Participants.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList(),
                 Channel = ch.Name,
                 Header = Headers.GET_PARTS_CHANNEL
             };
@@ -186,11 +219,11 @@ namespace Socket.Server
             if (socketC.GUID == null)
             {                
                 socketC.SetGuid(message.From, message.FGUID);
-                Socket.Channel.Channel.AllChannels[0].Add(socketC);
-                socketC.SetChannel(Socket.Channel.Channel.AllChannels[0].Name);
+                Socket.Channel.Channel.All[0].Add(socketC);
+                socketC.SetChannel(Socket.Channel.Channel.All[0].Name);
                 socketC.SendMessage(new Message { Header = Headers.SET_CHANNEL, Channel = socketC.Channel });
 
-                Socket.Channel.Channel.AllChannels[0].InformNewUserIncomming(socketC);
+                Socket.Channel.Channel.All[0].InformNewUserIncomming(socketC);
 
                 OnClientAccepted?.Invoke(socketC);
 

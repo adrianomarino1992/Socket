@@ -19,6 +19,7 @@ namespace Socket.Messages
         public static readonly string USER_ENTERED_ROOM = "USERHSFFO99633JSJJSGFDH36S565AYHGDAS";
         public static readonly string USER_LEFT_ROOM = "USELEFTSJHTHWROOMSJJSGFDH36S565AYHGDAS";
         public static readonly string GET_PARTS_CHANNEL = "DSAHJFHGWERRRRRSFGSDGFDH36S565AYHGDAS";
+        public static readonly string GET_ALL_CHANNEL = "FFDSJ8877F4D44DF88DFHDHALLFSHGYYYYRTSGS";
         
     }
 }

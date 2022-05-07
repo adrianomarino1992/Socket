@@ -4,6 +4,9 @@
     <Compile Update="Ch_c.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Ch_ch.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Ch_L.cs">
       <SubType>Form</SubType>
     </Compile>

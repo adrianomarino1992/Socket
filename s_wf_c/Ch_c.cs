@@ -1,5 +1,7 @@
 using Socket.Client;
+using Socket.DTO;
 using System.ComponentModel;
+
 
 namespace s_wf_c
 {
@@ -26,13 +28,36 @@ namespace s_wf_c
             _socket.OnSocketLeftInTheChannel += _socket_OnSocketLeftInTheChannel;
             _socket.OnConnectionCheckedAsync += _socket_OnConnectionCheckedAsync;
             _socket.OnPartsOfChannelUpdated += _socket_OnPartsOfChannelUpdated;
-            
+            _socket.OnReceiveChannelsInfo += _socket_OnReceiveChannelsInfo;
 
             _socket.RequestOthersPartsOfChannel();
 
         }
 
-        private void _socket_OnPartsOfChannelUpdated(List<Socket.Messages.UserMessageDTO> arg1, string arg2, SocketC arg3)
+        private void _socket_OnReceiveChannelsInfo(Socket.Messages.Body.RequestChannelsInfoBody arg1, SocketC arg2)
+        {
+
+            Ch_ch lg = new Ch_ch(arg1);
+
+            if (lg.ShowDialog() == DialogResult.OK)
+            {
+                _socket.ChangeChannel(lg.Channel);
+
+                _ = Task.Run(async () =>
+                {
+
+                    await Task.Delay(300);
+
+
+                    _socket.RequestOthersPartsOfChannel();
+
+
+                });
+
+            }
+        }
+
+        private void _socket_OnPartsOfChannelUpdated(List<UserDTO> arg1, string arg2, SocketC arg3)
         {
             m_onMainT(() =>
             {
@@ -130,6 +155,8 @@ namespace s_wf_c
         {
             m_onMainT(() =>
             {
+                lvMsg.Items.Clear();
+                lvMsg.Items.Add($"Changed to channel: {arg1.Channel}");
                 lblChannel.Text = arg1.Channel;
             });
         }
@@ -157,6 +184,21 @@ namespace s_wf_c
         private void m_onMainT(Action action)
         {
             this.Invoke(new Action(action));
+        }
+
+        private void Ch_c_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblChannel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnRequestChannels_Click(object sender, EventArgs e)
+        {
+            _socket.RequestAllChannels();
         }
     }
 }
