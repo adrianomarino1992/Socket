@@ -52,7 +52,17 @@ namespace s_wf_c
         private void _socket_OnHandShakeDone(Socket.Messages.Message arg1, SocketC arg2)
         {
             this.Hide();
-            new Ch_c(_socket).Show();
+            _ = Task.Run(async () => {
+
+                await Task.Delay(500);
+
+                this.Invoke(new Action(() =>
+                {
+                    new Ch_c(_socket).Show();
+
+                }));
+            
+            });
         }
 
         private void _socket_OnConnectionFail(Exception obj)

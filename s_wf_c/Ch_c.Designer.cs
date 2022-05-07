@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Ch_c));
-            this.lvMsg = new System.Windows.Forms.ListBox();
             this.lvlUser = new System.Windows.Forms.ListBox();
             this.txtMsg = new System.Windows.Forms.TextBox();
             this.btnSend = new System.Windows.Forms.Button();
@@ -37,22 +36,10 @@
             this.lblChannel = new System.Windows.Forms.Label();
             this.lblStatus = new System.Windows.Forms.Label();
             this.btnRequestChannels = new System.Windows.Forms.PictureBox();
+            this.lvMsg = new System.Windows.Forms.ListView();
+            this.colMsg = new System.Windows.Forms.ColumnHeader();
             ((System.ComponentModel.ISupportInitialize)(this.btnRequestChannels)).BeginInit();
             this.SuspendLayout();
-            // 
-            // lvMsg
-            // 
-            this.lvMsg.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvMsg.BackColor = System.Drawing.Color.White;
-            this.lvMsg.FormattingEnabled = true;
-            this.lvMsg.ItemHeight = 18;
-            this.lvMsg.Location = new System.Drawing.Point(10, 50);
-            this.lvMsg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.lvMsg.Name = "lvMsg";
-            this.lvMsg.Size = new System.Drawing.Size(730, 400);
-            this.lvMsg.TabIndex = 0;
             // 
             // lvlUser
             // 
@@ -66,6 +53,7 @@
             this.lvlUser.Name = "lvlUser";
             this.lvlUser.Size = new System.Drawing.Size(163, 400);
             this.lvlUser.TabIndex = 1;
+            this.lvlUser.Click += new System.EventHandler(this.lvlUser_Click);
             // 
             // txtMsg
             // 
@@ -142,12 +130,37 @@
             this.btnRequestChannels.TabStop = false;
             this.btnRequestChannels.Click += new System.EventHandler(this.btnRequestChannels_Click);
             // 
+            // lvMsg
+            // 
+            this.lvMsg.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvMsg.AutoArrange = false;
+            this.lvMsg.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colMsg});
+            this.lvMsg.FullRowSelect = true;
+            this.lvMsg.Location = new System.Drawing.Point(12, 50);
+            this.lvMsg.MultiSelect = false;
+            this.lvMsg.Name = "lvMsg";
+            this.lvMsg.RightToLeftLayout = true;
+            this.lvMsg.ShowItemToolTips = true;
+            this.lvMsg.Size = new System.Drawing.Size(728, 400);
+            this.lvMsg.TabIndex = 8;
+            this.lvMsg.UseCompatibleStateImageBehavior = false;
+            this.lvMsg.View = System.Windows.Forms.View.Details;
+            // 
+            // colMsg
+            // 
+            this.colMsg.Text = "Messages:";
+            this.colMsg.Width = 500;
+            // 
             // Ch_c
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(921, 541);
+            this.Controls.Add(this.lvMsg);
             this.Controls.Add(this.btnRequestChannels);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.lblChannel);
@@ -155,7 +168,6 @@
             this.Controls.Add(this.btnSend);
             this.Controls.Add(this.txtMsg);
             this.Controls.Add(this.lvlUser);
-            this.Controls.Add(this.lvMsg);
             this.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MinimumSize = new System.Drawing.Size(937, 580);
@@ -169,8 +181,6 @@
         }
 
         #endregion
-
-        private ListBox lvMsg;
         private ListBox lvlUser;
         private TextBox txtMsg;
         private Button btnSend;
@@ -178,5 +188,7 @@
         private Label lblChannel;
         private Label lblStatus;
         private PictureBox btnRequestChannels;
+        private ListView lvMsg;
+        private ColumnHeader colMsg;
     }
 }

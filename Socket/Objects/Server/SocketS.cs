@@ -202,8 +202,8 @@ namespace Socket.Server
             return new Message
             {
                 DateTime = DateTime.Now,
-                From = "Server",
-                FGUID = "Server"
+                From = Configurations.Config.ServerName,
+                FGUID = Configurations.Config.ServerGUID
             };
         }
 
@@ -219,6 +219,9 @@ namespace Socket.Server
             if (socketC.GUID == null)
             {                
                 socketC.SetGuid(message.From, message.FGUID);
+                if (Socket.Channel.Channel.All.Count == 0)
+                    Socket.Channel.Channel.CreateChannel(Configurations.Config.ServerName, this);
+
                 Socket.Channel.Channel.All[0].Add(socketC);
                 socketC.SetChannel(Socket.Channel.Channel.All[0].Name);
                 socketC.SendMessage(new Message { Header = Headers.SET_CHANNEL, Channel = socketC.Channel });

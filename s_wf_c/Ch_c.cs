@@ -14,6 +14,13 @@ namespace s_wf_c
             _socket = socket;
         }
 
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+
+            lvMsg.Columns[0].Width = lvMsg.Width - 4;
+        }
+
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
@@ -29,6 +36,7 @@ namespace s_wf_c
             _socket.OnConnectionCheckedAsync += _socket_OnConnectionCheckedAsync;
             _socket.OnPartsOfChannelUpdated += _socket_OnPartsOfChannelUpdated;
             _socket.OnReceiveChannelsInfo += _socket_OnReceiveChannelsInfo;
+           
 
             _socket.RequestOthersPartsOfChannel();
 
@@ -111,8 +119,18 @@ namespace s_wf_c
         {
             m_onMainT(() =>
             {
+                if(arg1.TGUID == lblUser.Text.Split('#')[1])
+                {
+                    lvMsg.Items.Add(new ListViewItem { Text = $"Private from {arg1.From}: {arg1.Body}", ToolTipText = $"Received in {DateTime.Now}", BackColor = Color.FromArgb(1, 240, 189, 189) }).Focused = true;
 
-                lvMsg.Items.Add($"{arg1.From}: {arg1.Body}");
+                }
+                else {
+
+                    lvMsg.Items.Add(new ListViewItem { Text = $"{arg1.From}: {arg1.Body}", ToolTipText = $"Received in {DateTime.Now}", BackColor = Color.FromArgb(1, 207, 255, 247) }).Focused = true;
+
+                }
+
+
 
             });
 
@@ -156,7 +174,8 @@ namespace s_wf_c
             m_onMainT(() =>
             {
                 lvMsg.Items.Clear();
-                lvMsg.Items.Add($"Changed to channel: {arg1.Channel}");
+                lvMsg.Items.Add(new ListViewItem { Text = $"Changed to channel: {arg1.Channel}", ToolTipText = $"Changed in {DateTime.Now}", BackColor = Color.FromArgb(1, 240, 222, 189) }).Focused = true;
+                
                 lblChannel.Text = arg1.Channel;
             });
         }
@@ -166,17 +185,56 @@ namespace s_wf_c
             if (String.IsNullOrEmpty(txtMsg.Text.Trim()))
                 return;
 
-            lvMsg.Items.Add($"You: {txtMsg.Text.Trim()}");
+            string uid = m_getUid();
+            if(String.IsNullOrEmpty(uid) && uid != lblUser.Text.Split('#')[1])
+            {
+                lvMsg.Items.Add(new ListViewItem { Text = $"You: {txtMsg.Text.Trim()}", ToolTipText = $"Sent in {DateTime.Now}", BackColor = Color.FromArgb(1, 255, 239, 196 ) }).Focused = true;
+                _socket.SendMessage(txtMsg.Text);
+            }
+            else
+            {
+                lvMsg.Items.Add(new ListViewItem { Text = $"Private to {m_getUser(uid)}: {txtMsg.Text.Trim()}", ToolTipText = $"Sent in {DateTime.Now}", BackColor = Color.FromArgb(1, 240, 189, 189)}).Focused = true;
+                _socket.SendMessageTo(txtMsg.Text, uid);
+            }
 
-            _socket.SendMessage(txtMsg.Text);
+            
 
             txtMsg.Text = String.Empty;
         }
 
+        private string m_getUser(string uid)
+        {
+            foreach (string u in lvlUser.Items)
+            {
+                if (u.Split('#')[1] ==uid)
+                {
+                    return u.Split('#')[0];
+                }
+            }
+            return String.Empty;
+        }
+
+        private string m_getUid()
+        {
+            if(txtMsg.Text.Length > 6)
+            {
+                foreach(string u in lvlUser.Items)
+                {
+                    if(u.Split('#')[1] == txtMsg.Text.Substring(1, 5))
+                    {
+                        string uid = txtMsg.Text.Substring(1, 5);
+                        txtMsg.Text = txtMsg.Text.Substring(6);
+                        return uid;
+                    }
+                }
+            }
+            return String.Empty;
+        }
         private void txtMsg_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
+                e.SuppressKeyPress = true;
                 btnSend.PerformClick();
             }
         }
@@ -199,6 +257,15 @@ namespace s_wf_c
         private void btnRequestChannels_Click(object sender, EventArgs e)
         {
             _socket.RequestAllChannels();
+        }
+
+        private void lvlUser_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                txtMsg.Text = $"#{lvlUser.SelectedItem.ToString().Split('#')[1]}:";
+            }
+            catch { }
         }
     }
 }
