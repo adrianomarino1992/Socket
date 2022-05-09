@@ -23,7 +23,7 @@ packageReference
 <PackageReference Include="Adr.MySockets" Version="1.0.0" />
 ```
 
-## Sample of usage
+## Sample of basic events only
 
 **Create a simple server:**
 ```csharp
@@ -73,7 +73,8 @@ packageReference
         private static void Cli_OnConnected(SocketC obj) => Console.WriteLine("Connected!");
 ```
 ## Check the complete chat app project 
-[![Alt text](https://raw.githubusercontent.com/adrianomarino1992/Socket/master/t.png)](https://github.com/adrianomarino1992/Socket)
+**GitHub link : https://github.com/adrianomarino1992/Socket**
+[![Alt text](https://raw.githubusercontent.com/adrianomarino1992/Socket/master/t.png)](https://raw.githubusercontent.com/adrianomarino1992/Socket/master/t.png)
 
 
 
