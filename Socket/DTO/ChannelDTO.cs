@@ -1,4 +1,4 @@
-﻿namespace Socket.DTO
+﻿namespace MySocket.DTO
 {
     public class ChannelDTO
     {

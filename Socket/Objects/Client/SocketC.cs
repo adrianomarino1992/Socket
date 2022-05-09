@@ -1,11 +1,11 @@
-﻿using Socket.DTO;
-using Socket.Messages;
-using Socket.Messages.Body;
+﻿using MySocket.DTO;
+using MySocket.Messages;
+using MySocket.Messages.Body;
 
 using System.Net.Sockets;
 
 
-namespace Socket.Client
+namespace MySocket.Client
 {
     public class SocketC
     {
@@ -79,7 +79,7 @@ namespace Socket.Client
         {
 #pragma warning enable
             if (!tcpClient.Connected)
-                throw new Socket.Exceptions.SocketConnectionException("The socket is not connected with the server");
+                throw new MySocket.Exceptions.SocketConnectionException("The socket is not connected with the server");
             _threadKill = false;
             _tcpClient = tcpClient;
             _network = tcpClient.GetStream();
@@ -92,7 +92,7 @@ namespace Socket.Client
         public void Connect(string host, int port)
         {
             if (!_canConnect)
-                throw new Socket.Exceptions.SocketConnectionException("The socket is already connected with the server");
+                throw new MySocket.Exceptions.SocketConnectionException("The socket is already connected with the server");
             try
             {
                 _threadKill = false;
@@ -270,7 +270,7 @@ namespace Socket.Client
         private void m_start()
         {
             if (_thread != null && _thread.IsAlive)
-                throw new Socket.Exceptions.SocketConnectionException("The server is already started");
+                throw new MySocket.Exceptions.SocketConnectionException("The server is already started");
 
             _thread = new Thread(m_readNetWork);
             _thread.IsBackground = true;

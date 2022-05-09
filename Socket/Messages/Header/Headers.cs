@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Socket.Messages
+namespace MySocket.Messages
 {
     public static class Headers
     {

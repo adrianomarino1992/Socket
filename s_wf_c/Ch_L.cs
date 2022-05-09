@@ -1,4 +1,4 @@
-﻿using Socket.Client;
+﻿using MySocket.Client;
 
 namespace s_wf_c
 {    
@@ -49,7 +49,7 @@ namespace s_wf_c
 
         
 
-        private void _socket_OnHandShakeDone(Socket.Messages.Message arg1, SocketC arg2)
+        private void _socket_OnHandShakeDone(MySocket.Messages.Message arg1, SocketC arg2)
         {
             this.Hide();
 

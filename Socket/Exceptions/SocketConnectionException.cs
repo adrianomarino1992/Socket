@@ -1,4 +1,4 @@
-﻿namespace Socket.Exceptions
+﻿namespace MySocket.Exceptions
 {
     public class SocketConnectionException : Exception
     {

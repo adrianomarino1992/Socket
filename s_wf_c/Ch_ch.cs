@@ -1,5 +1,5 @@
-﻿using Socket.DTO;
-using Socket.Messages.Body;
+﻿using MySocket.DTO;
+using MySocket.Messages.Body;
 
 namespace s_wf_c
 {

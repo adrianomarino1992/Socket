@@ -1,15 +1,10 @@
-﻿using Socket.DTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MySocket.DTO;
 
-namespace Socket.Messages.Body
+namespace MySocket.Messages.Body
 {
     public class RequestChannelsInfoBody
     {
-        public List<ChannelDTO> Channels { get; set; }        
+        public List<ChannelDTO> Channels { get; set; }
 
         public RequestChannelsInfoBody() { }
     }

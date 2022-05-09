@@ -1,12 +1,12 @@
-﻿using Socket.Client;
-using Socket.DTO;
-using Socket.Messages;
-using Socket.Messages.Body;
+﻿using MySocket.Client;
+using MySocket.DTO;
+using MySocket.Messages;
+using MySocket.Messages.Body;
 
 using System.Net;
 using System.Net.Sockets;
 
-namespace Socket.Server
+namespace MySocket.Server
 {
     public class SocketS
     {
@@ -14,9 +14,9 @@ namespace Socket.Server
 
         public event Action<SocketC> OnClientAccepted;
         public event Action<SocketC> OnClientDisconnect;
-        public event Action<Socket.Server.SocketS> OnServerUp;
-        public event Action<Socket.Server.SocketS> OnServerDown;
-        public event Action<Socket.Server.SocketS> OnTryUpServerFail;
+        public event Action<MySocket.Server.SocketS> OnServerUp;
+        public event Action<MySocket.Server.SocketS> OnServerDown;
+        public event Action<MySocket.Server.SocketS> OnTryUpServerFail;
         public event Action<Message, SocketC> OnMessageReceived;
         public event Action<Exception> OnExceptionReceived;
         public event Action<ChangeChannelBody, SocketC> OnClientChangeChannel;
@@ -90,7 +90,7 @@ namespace Socket.Server
                     throw new Exceptions.SocketException($"The message must be a valid text");
 
 
-                Socket.Channel.Channel.All.ForEach(d => d.BroadCast(codMsg, socket));
+                MySocket.Channel.Channel.All.ForEach(d => d.BroadCast(codMsg, socket));
             }
             catch (Exception ex)
             {
@@ -109,7 +109,7 @@ namespace Socket.Server
 
                 _keepRunning = true;
 
-                Socket.Channel.Channel.CreateChannel(DefaultChannel, this);
+                MySocket.Channel.Channel.CreateChannel(DefaultChannel, this);
 
                 _thread = new Thread(m_backGWork);
 
@@ -171,7 +171,7 @@ namespace Socket.Server
                 if (!m_checkPrivMssg(codMsg, socketC))
                     return;
 
-                Socket.Channel.Channel cliChannel = Socket.Channel.Channel.All.FirstOrDefault(d => d.Contains(socketC));
+                MySocket.Channel.Channel cliChannel = MySocket.Channel.Channel.All.FirstOrDefault(d => d.Contains(socketC));
 
                 if (cliChannel != null)
                 {
@@ -227,7 +227,7 @@ namespace Socket.Server
         {
             try
             {
-                Socket.Channel.Channel ch = Socket.Channel.Channel.All.Where(d => d.Contains(socket)).FirstOrDefault();
+                MySocket.Channel.Channel ch = MySocket.Channel.Channel.All.Where(d => d.Contains(socket)).FirstOrDefault();
 
                 if (ch == null)
                     return;
@@ -258,7 +258,7 @@ namespace Socket.Server
         {
             try
             {
-                Socket.Channel.Channel ch = Socket.Channel.Channel.All.Where(d => d.Contains(socket)).FirstOrDefault();
+                MySocket.Channel.Channel ch = MySocket.Channel.Channel.All.Where(d => d.Contains(socket)).FirstOrDefault();
 
                 if (ch == null)
                     return;
@@ -284,7 +284,7 @@ namespace Socket.Server
             {
                 ChangeChannelBody ch = chgN.Body.FromJson<ChangeChannelBody>();
 
-                Socket.Channel.Channel.ChangeChannel(ch.From, ch.To, socket, this);
+                MySocket.Channel.Channel.ChangeChannel(ch.From, ch.To, socket, this);
 
                 OnClientChangeChannel?.Invoke(ch, socket);
             }
@@ -309,7 +309,7 @@ namespace Socket.Server
         {
             try
             {
-                Socket.Channel.Channel.Disconnect(socketC);
+                MySocket.Channel.Channel.Disconnect(socketC);
 
                 OnClientDisconnect?.Invoke(socketC);
             }
@@ -326,14 +326,14 @@ namespace Socket.Server
                 if (socketC.GUID == null)
                 {
                     socketC.SetGuid(message.From, message.FGUID);
-                    if (Socket.Channel.Channel.All.Count == 0)
-                        Socket.Channel.Channel.CreateChannel(Configurations.Config.ServerName, this);
+                    if (MySocket.Channel.Channel.All.Count == 0)
+                        MySocket.Channel.Channel.CreateChannel(Configurations.Config.ServerName, this);
 
-                    Socket.Channel.Channel.All[0].Add(socketC);
-                    socketC.SetChannel(Socket.Channel.Channel.All[0].Name);
+                    MySocket.Channel.Channel.All[0].Add(socketC);
+                    socketC.SetChannel(MySocket.Channel.Channel.All[0].Name);
                     socketC.SendMessage(new Message { Header = Headers.SET_CHANNEL, Channel = socketC.Channel });
 
-                    Socket.Channel.Channel.All[0].InformNewUserIncomming(socketC);
+                    MySocket.Channel.Channel.All[0].InformNewUserIncomming(socketC);
 
                     OnClientAccepted?.Invoke(socketC);
 

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 
-namespace Socket
+namespace MySocket
 {
     public static class Json
     {

@@ -1,5 +1,5 @@
-using Socket.Client;
-using Socket.DTO;
+using MySocket.Client;
+using MySocket.DTO;
 using System.ComponentModel;
 
 
@@ -58,7 +58,7 @@ namespace s_wf_c
             m_addMessage("Reconnected to the server", $"Reconnected in {DateTime.Now}", MsgTypes.CHANGECHANNEL);
         }
 
-        private void _socket_OnReceiveChannelsInfo(Socket.Messages.Body.RequestChannelsInfoBody arg1, SocketC arg2)
+        private void _socket_OnReceiveChannelsInfo(MySocket.Messages.Body.RequestChannelsInfoBody arg1, SocketC arg2)
         {
 
             Ch_ch lg = new Ch_ch(arg1);
@@ -105,7 +105,7 @@ namespace s_wf_c
         }
 
 
-        private void _socket_OnSocketLeftInTheChannel(Socket.Messages.Body.UserEnterOrLeaveTheChannelBody body, List<UserDTO> users)
+        private void _socket_OnSocketLeftInTheChannel(MySocket.Messages.Body.UserEnterOrLeaveTheChannelBody body, List<UserDTO> users)
         {
             m_onMainT(() =>
             {
@@ -121,7 +121,7 @@ namespace s_wf_c
             });
         }
 
-        private void _socket_OnNewSocketEnterInTheChannel(Socket.Messages.Body.UserEnterOrLeaveTheChannelBody body, List<UserDTO> users)
+        private void _socket_OnNewSocketEnterInTheChannel(MySocket.Messages.Body.UserEnterOrLeaveTheChannelBody body, List<UserDTO> users)
         {
             m_onMainT(() =>
             {
@@ -136,7 +136,7 @@ namespace s_wf_c
             });
         }
 
-        private void _socket_OnMessageReceived(Socket.Messages.Message arg1, SocketC arg2)
+        private void _socket_OnMessageReceived(MySocket.Messages.Message arg1, SocketC arg2)
         {
             m_onMainT(() =>
             {
@@ -158,7 +158,7 @@ namespace s_wf_c
 
         }
 
-        private void _socket_OnHandShakeDone(Socket.Messages.Message arg1, SocketC arg2)
+        private void _socket_OnHandShakeDone(MySocket.Messages.Message arg1, SocketC arg2)
         {
             m_onMainT(() =>
             {                
@@ -191,7 +191,7 @@ namespace s_wf_c
 
         }
 
-        private void _socket_OnChannelChanged(Socket.Messages.Message arg1, SocketC arg2)
+        private void _socket_OnChannelChanged(MySocket.Messages.Message arg1, SocketC arg2)
         {
             m_onMainT(() =>
             {

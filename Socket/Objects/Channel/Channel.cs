@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Socket.Messages;
-using Socket.Client;
-using Socket.Server;
-using Socket.DTO;
+﻿using MySocket.Client;
+using MySocket.DTO;
+using MySocket.Messages;
+using MySocket.Server;
 
-namespace Socket.Channel
+namespace MySocket.Channel
 {
     public class Channel
     {
@@ -38,8 +33,8 @@ namespace Socket.Channel
             }
             catch { }
 
-            Channel curr = Channel.All.Where(d => d.Name == chgN).First();            
-                       
+            Channel curr = Channel.All.Where(d => d.Name == chgN).First();
+
 
             curr.Add(socket);
 
@@ -51,18 +46,18 @@ namespace Socket.Channel
 
                 if (prevC._clients.Count == 0)
                     Channel.DeleteChannel(prevC.Name);
-                
+
             }
-                
+
 
             Message msg = new Message { DateTime = DateTime.Now, From = Configurations.Config.ServerName, FGUID = Configurations.Config.ServerGUID };
             msg.Channel = curr.Name;
             msg.Header = Headers.CHANGE_CHANNEL;
-            msg.ChannelsParts = curr.Participants.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList();           
+            msg.ChannelsParts = curr.Participants.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList();
 
             socket.SendMessage(msg);
 
-            curr.InformNewUserIncomming(socket);            
+            curr.InformNewUserIncomming(socket);
 
             return curr;
         }
@@ -177,7 +172,7 @@ namespace Socket.Channel
 
             foreach (SocketC sc in tgts)
             {
-                if(sc != null && sc.GUID.Trim() != sender.GUID.Trim())
+                if (sc != null && sc.GUID.Trim() != sender.GUID.Trim())
                     sc.SendMessage(codMsg);
             }
 
@@ -196,15 +191,15 @@ namespace Socket.Channel
             };
 
 
-           co.ChannelsParts = _clients.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList();
+            co.ChannelsParts = _clients.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList();
 
             foreach (SocketC sc in _clients)
             {
-                if(sc != null && sc.GUID != sender.GUID)
-                {                    
+                if (sc != null && sc.GUID != sender.GUID)
+                {
                     sc.SendMessage(co);
                 }
-                    
+
             }
 
         }

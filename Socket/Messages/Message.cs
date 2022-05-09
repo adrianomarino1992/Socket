@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
-using Socket.DTO;
+using MySocket.DTO;
 
-namespace Socket.Messages
+namespace MySocket.Messages
 {
     public class Message
     {

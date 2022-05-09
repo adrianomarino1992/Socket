@@ -1,6 +1,6 @@
-﻿using Socket.Messages;
-using Socket.Client;
-using Socket.Server;
+﻿using MySocket.Messages;
+using MySocket.Client;
+using MySocket.Server;
 
 using System.Net;
 
@@ -70,7 +70,7 @@ namespace cS_test
             Console.WriteLine("Type a command:");
         }
 
-        private static void S_OnClientChangeChannel(Socket.Messages.Body.ChangeChannelBody arg1, SocketC arg2)
+        private static void S_OnClientChangeChannel(MySocket.Messages.Body.ChangeChannelBody arg1, SocketC arg2)
         {
             Console.WriteLine($"Client {arg2.UserName} change {arg1.From} to {arg1.To}");
             Console.WriteLine();
