@@ -1,31 +1,41 @@
-﻿using Socket.Messages;
+﻿using Socket.Client;
+using Socket.DTO;
+using Socket.Messages;
+using Socket.Messages.Body;
+
 using System.Net;
 using System.Net.Sockets;
-using Socket;
-using Socket.Messages.Body;
-using Socket.Client;
-using Socket.Channel;
-using Socket.DTO;
 
 namespace Socket.Server
 {
     public class SocketS
     {
+        #region EVENTS
 
         public event Action<SocketC> OnClientAccepted;
         public event Action<SocketC> OnClientDisconnect;
-        public event Action<Message, SocketC> OnMessageReceived;        
+        public event Action<Socket.Server.SocketS> OnServerUp;
+        public event Action<Socket.Server.SocketS> OnServerDown;
+        public event Action<Socket.Server.SocketS> OnTryUpServerFail;
+        public event Action<Message, SocketC> OnMessageReceived;
         public event Action<Exception> OnExceptionReceived;
         public event Action<ChangeChannelBody, SocketC> OnClientChangeChannel;
+        #endregion
 
-        private string _defaultChannel = $"Server";
 
+        #region PRIVATE FIELDS
         private TcpListener _tcpListener;
-
         private Thread _thread;
-        private bool _isAlive { get => _thread != null && _thread.IsAlive; }        
+        private bool _keepRunning;
+        private bool _isAlive { get => _thread != null && _thread.IsAlive; }
+        #endregion
 
-        public string DefaultChannel { get => _defaultChannel; set => _defaultChannel = value; }
+
+        #region PUBLIC PROPERTIES
+        public string DefaultChannel { get => Configurations.Config.ServerName; }
+        public bool Connected => m_connected();
+
+        #endregion
 
 #pragma warning disable
         public SocketS(IPEndPoint localEPt)
@@ -34,11 +44,118 @@ namespace Socket.Server
             _tcpListener = new TcpListener(localEPt);
         }
 
+        #region CONNECTION METHODS
         public void Connect()
+        {
+            if (m_connected())
+            {
+                OnServerUp?.Invoke(this);
+                return;
+            }
+
+            m_start();
+        }
+
+        public void Disconnect()
         {
             try
             {
-                m_start();
+                if (!m_connected())
+                {
+                    OnServerDown?.Invoke(this);
+                    return;
+                }
+
+                _keepRunning = false;
+
+                _tcpListener.Stop();
+
+                OnServerDown?.Invoke(this);
+            }
+            catch (Exception ex)
+            {
+                OnExceptionReceived?.Invoke(ex);
+            }
+
+        }
+        #endregion
+
+
+        #region MESSAGE METHODS
+        public void SendMessage(string codMsg, SocketC socket = null)
+        {
+            try
+            {
+                if (String.IsNullOrEmpty(codMsg))
+                    throw new Exceptions.SocketException($"The message must be a valid text");
+
+
+                Socket.Channel.Channel.All.ForEach(d => d.BroadCast(codMsg, socket));
+            }
+            catch (Exception ex)
+            {
+                OnExceptionReceived?.Invoke(ex);
+            }
+
+        }
+        #endregion
+
+        #region PRIVATE METHODS
+        private void m_start()
+        {
+            try
+            {
+                _tcpListener.Start();
+
+                _keepRunning = true;
+
+                Socket.Channel.Channel.CreateChannel(DefaultChannel, this);
+
+                _thread = new Thread(m_backGWork);
+
+                _thread.IsBackground = true;
+
+                _thread.Start();
+
+                OnServerUp?.Invoke(this);
+            }
+            catch (Exception ex)
+            {
+                OnTryUpServerFail?.Invoke(this);
+                OnExceptionReceived?.Invoke(ex);
+            }
+
+        }
+
+        private bool m_connected()
+        {
+           return _tcpListener.Server.IsBound;
+        }
+        private void m_backGWork()
+        {
+            while (_isAlive && _keepRunning)
+            {
+                try
+                {
+                    SocketC incomming = new SocketC(_tcpListener.AcceptTcpClient());
+
+                    incomming.OnMessageArriveFromClient += m_OnMessageArriveFromClient;
+                    incomming.OnHandShakeDone += m_OnHandShakeDone;
+                }
+                catch (Exception ex)
+                {
+                    OnExceptionReceived?.Invoke(ex);
+                }
+            }
+
+        }
+
+        private void m_OnHandShakeDone(Message msg, SocketC socket)
+        {
+            try
+            {
+                if (!m_chekGuid(msg, socket))
+                    return;
             }
             catch (Exception ex)
             {
@@ -47,65 +164,26 @@ namespace Socket.Server
         }
 
 
-
-        public void SendMessage(string codMsg, SocketC socket = null)
-        {
-            if (String.IsNullOrEmpty(codMsg))
-                throw new Exceptions.SocketException($"The message must be a valid text");
-
-
-            Socket.Channel.Channel.All.ForEach(d => d.BroadCast(codMsg, socket));
-           
-        }
-
-        private void m_start()
-        {
-            _tcpListener.Start();
-
-            Socket.Channel.Channel.CreateChannel(_defaultChannel, this);
-
-            _thread = new Thread(m_backGWork);
-
-            _thread.IsBackground = true;
-
-            _thread.Start();
-
-        }
-
-        public void m_backGWork()
-        {
-            while (_isAlive)
-            {
-                SocketC incomming = new SocketC(_tcpListener.AcceptTcpClient());
-
-                incomming.OnMessageArriveFromClient += m_OnMessageArriveFromClient;                
-                incomming.OnHandShakeDone += m_OnHandShakeDone; 
-            }
-
-        }
-
-        private void m_OnHandShakeDone(Message msg, SocketC socket)
-        {
-            if (!m_chekGuid(msg, socket))
-                return;
-        }
-
-        
-
         private void m_OnMessageArriveFromClient(Message codMsg, SocketC socketC)
-        {            
-
-            if (!m_checkPrivMssg(codMsg, socketC))
-                return;
-
-            Socket.Channel.Channel cliChannel = Socket.Channel.Channel.All.FirstOrDefault(d => d.Contains(socketC));
-
-            if (cliChannel != null)
+        {
+            try
             {
-                cliChannel.BroadCast(codMsg, socketC);
-            }
+                if (!m_checkPrivMssg(codMsg, socketC))
+                    return;
 
-            OnMessageReceived?.Invoke(codMsg, socketC);
+                Socket.Channel.Channel cliChannel = Socket.Channel.Channel.All.FirstOrDefault(d => d.Contains(socketC));
+
+                if (cliChannel != null)
+                {
+                    cliChannel.BroadCast(codMsg, socketC);
+                }
+
+                OnMessageReceived?.Invoke(codMsg, socketC);
+            }
+            catch (Exception ex)
+            {
+                OnExceptionReceived?.Invoke(ex);
+            }
         }
 
         private bool m_checkPrivMssg(Message codMsg, SocketC socketC)
@@ -118,7 +196,7 @@ namespace Socket.Server
             }
 
             if (codMsg.Header == Headers.CHANGE_CHANNEL)
-            {               
+            {
 
                 m_chgChl(codMsg, socketC);
 
@@ -147,54 +225,74 @@ namespace Socket.Server
 
         private void m_sendAllPesChl(Message chgN, SocketC socket)
         {
-            Socket.Channel.Channel ch = Socket.Channel.Channel.All.Where(d => d.Contains(socket)).FirstOrDefault();
-
-            if (ch == null)
-                return;
-
-            RequestChannelsInfoBody body = new RequestChannelsInfoBody();
-            body.Channels = new List<ChannelDTO>();
-            body.Channels = Channel.Channel.All.Select(d => new ChannelDTO { Name = d.Name, Users = d.Participants.Select(p => new UserDTO { Name = p.UserName, GUID = p.GUID }).ToList() }).ToList();
-
-            Message msg = new Message
+            try
             {
-                ChannelsParts = ch.Participants.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList(),
-                Channel = ch.Name,
-                Header = Headers.GET_ALL_CHANNEL,
-                Body = body.ToJson()
-                
-            };
+                Socket.Channel.Channel ch = Socket.Channel.Channel.All.Where(d => d.Contains(socket)).FirstOrDefault();
 
-            socket.SendMessage(msg);
+                if (ch == null)
+                    return;
+
+                RequestChannelsInfoBody body = new RequestChannelsInfoBody();
+                body.Channels = new List<ChannelDTO>();
+                body.Channels = Channel.Channel.All.Select(d => new ChannelDTO { Name = d.Name, Users = d.Participants.Select(p => new UserDTO { Name = p.UserName, GUID = p.GUID }).ToList() }).ToList();
+
+                Message msg = new Message
+                {
+                    ChannelsParts = ch.Participants.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList(),
+                    Channel = ch.Name,
+                    Header = Headers.GET_ALL_CHANNEL,
+                    Body = body.ToJson()
+
+                };
+
+                socket.SendMessage(msg);
+            }
+            catch (Exception ex)
+            {
+                OnExceptionReceived?.Invoke(ex);
+            }
 
         }
 
         private void m_sendPesChl(Message chgN, SocketC socket)
         {
-            Socket.Channel.Channel ch = Socket.Channel.Channel.All.Where(d => d.Contains(socket)).FirstOrDefault();
-
-            if (ch == null)
-                return;
-
-            Message msg = new Message
+            try
             {
-                ChannelsParts = ch.Participants.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList(),
-                Channel = ch.Name,
-                Header = Headers.GET_PARTS_CHANNEL
-            };
+                Socket.Channel.Channel ch = Socket.Channel.Channel.All.Where(d => d.Contains(socket)).FirstOrDefault();
 
-            socket.SendMessage(msg);            
+                if (ch == null)
+                    return;
+
+                Message msg = new Message
+                {
+                    ChannelsParts = ch.Participants.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList(),
+                    Channel = ch.Name,
+                    Header = Headers.GET_PARTS_CHANNEL
+                };
+
+                socket.SendMessage(msg);
+            }
+            catch (Exception ex)
+            {
+                OnExceptionReceived?.Invoke(ex);
+            }
 
         }
         private void m_chgChl(Message chgN, SocketC socket)
         {
+            try
+            {
+                ChangeChannelBody ch = chgN.Body.FromJson<ChangeChannelBody>();
 
-            ChangeChannelBody ch = chgN.Body.FromJson<ChangeChannelBody>();
+                Socket.Channel.Channel.ChangeChannel(ch.From, ch.To, socket, this);
 
-            Socket.Channel.Channel.ChangeChannel(ch.From, ch.To, socket, this);
+                OnClientChangeChannel?.Invoke(ch, socket);
+            }
+            catch (Exception ex)
+            {
+                OnExceptionReceived?.Invoke(ex);
+            }
 
-            OnClientChangeChannel?.Invoke(ch, socket);
-            
         }
 
         private Message m_crtMsg()
@@ -209,32 +307,49 @@ namespace Socket.Server
 
         private void m_discCLi(SocketC socketC)
         {
-            Socket.Channel.Channel.Disconnect(socketC);
+            try
+            {
+                Socket.Channel.Channel.Disconnect(socketC);
 
-            OnClientDisconnect?.Invoke(socketC);
+                OnClientDisconnect?.Invoke(socketC);
+            }
+            catch (Exception ex)
+            {
+                OnExceptionReceived?.Invoke(ex);
+            }
         }
 
         private bool m_chekGuid(Message message, SocketC socketC)
         {
-            if (socketC.GUID == null)
-            {                
-                socketC.SetGuid(message.From, message.FGUID);
-                if (Socket.Channel.Channel.All.Count == 0)
-                    Socket.Channel.Channel.CreateChannel(Configurations.Config.ServerName, this);
+            try
+            {
+                if (socketC.GUID == null)
+                {
+                    socketC.SetGuid(message.From, message.FGUID);
+                    if (Socket.Channel.Channel.All.Count == 0)
+                        Socket.Channel.Channel.CreateChannel(Configurations.Config.ServerName, this);
 
-                Socket.Channel.Channel.All[0].Add(socketC);
-                socketC.SetChannel(Socket.Channel.Channel.All[0].Name);
-                socketC.SendMessage(new Message { Header = Headers.SET_CHANNEL, Channel = socketC.Channel });
+                    Socket.Channel.Channel.All[0].Add(socketC);
+                    socketC.SetChannel(Socket.Channel.Channel.All[0].Name);
+                    socketC.SendMessage(new Message { Header = Headers.SET_CHANNEL, Channel = socketC.Channel });
 
-                Socket.Channel.Channel.All[0].InformNewUserIncomming(socketC);
+                    Socket.Channel.Channel.All[0].InformNewUserIncomming(socketC);
 
-                OnClientAccepted?.Invoke(socketC);
+                    OnClientAccepted?.Invoke(socketC);
 
-                return false;
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                OnExceptionReceived?.Invoke(ex);
+
+                return true;
             }
 
-            return true;
-
-        }
+        } 
+        #endregion
     }
 }

@@ -19,7 +19,7 @@ namespace Socket.Channel
         {
             if (Channel.All.Any(d => d.Name.ToLower().Trim() == name.ToLower().Trim()))
             {
-                throw new Exceptions.ChannelException($"Channel {name} already exists");
+                return Channel.All.First(d => d.Name.ToLower().Trim() == name.ToLower().Trim());
             }
 
             Channel ch = new Channel(name, server);
@@ -138,7 +138,7 @@ namespace Socket.Channel
                         From = socketC.UserName,
                         FGUID = socketC.GUID,
                         DateTime = DateTime.Now,
-                        Body = $"User {socketC.UserName} entered in the room",
+                        Body = new Messages.Body.UserEnterOrLeaveTheChannelBody() { Channel = Name, Name = socketC.UserName, GUID = socketC.GUID }.ToJson(),
                         Header = Headers.USER_ENTERED_ROOM
                     }, socketC);
         }
@@ -152,7 +152,7 @@ namespace Socket.Channel
                         From = socketC.UserName,
                         FGUID = socketC.GUID,
                         DateTime = DateTime.Now,
-                        Body = $"User {socketC.UserName} left the room",
+                        Body = new Messages.Body.UserEnterOrLeaveTheChannelBody() { Channel = Name, Name = socketC.UserName, GUID = socketC.GUID }.ToJson(),
                         Header = Headers.USER_LEFT_ROOM
                     }, socketC);
         }

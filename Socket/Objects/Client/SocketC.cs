@@ -1,28 +1,37 @@
 ﻿using Socket.DTO;
 using Socket.Messages;
-using System.Net.Sockets;
 using Socket.Messages.Body;
-using System.Security.Permissions;
+
+using System.Net.Sockets;
+
 
 namespace Socket.Client
 {
     public class SocketC
     {
 
+        #region EVENTS
         public event Action<Message, SocketC> OnMessageReceived;
-        public event Action<Message> OnNewSocketEnterInTheChannel;
-        public event Action<Message> OnSocketLeftInTheChannel;
+        public event Action<UserEnterOrLeaveTheChannelBody, List<UserDTO>> OnNewSocketEnterInTheChannel;
+        public event Action<UserEnterOrLeaveTheChannelBody, List<UserDTO>> OnSocketLeftInTheChannel;
         public event Action<Message, SocketC> OnHandShakeDone;
         public event Action<SocketC> OnConnected;
+        public event Action<SocketC> OnReconnected;
+        public event Action<SocketC> OnReconnectFail;
         public event Action<SocketC> OnDisconnected;
         public event Action<Exception> OnConnectionFail;
         public event Action<Message, SocketC> OnChannelChanged;
         public event Action<RequestChannelsInfoBody, SocketC> OnReceiveChannelsInfo;
         public event Action<List<UserDTO>, string, SocketC> OnPartsOfChannelUpdated;
         public event Action<bool, DateTime> OnConnectionCheckedAsync;
+        #endregion
 
+        #region INTERNAL EVENTS
         internal event Action<Message, SocketC> OnMessageArriveFromClient;
+        #endregion
 
+
+        #region PRIVATE FIELDS
         private TcpClient _tcpClient;
         private NetworkStream _network;
         private bool _isAlive { get => _thread != null && _thread.IsAlive; }
@@ -31,18 +40,24 @@ namespace Socket.Client
         private string _guid;
         private string _host;
         private int _port;
+        private bool _canConnect;
         private string _channel;
         private DateTime _lastPing = DateTime.Now;
         private bool _lastStatus;
         private bool _threadKill;
+        private int _checkConnTimeSpan = 5;
+        #endregion
 
+        #region PUBLIC PROPERTIES
         public string UserName { get => _username; set => _username = value; }
         public string GUID { get => _guid; set => _guid = value; }
         public string Host { get => _host; }
         public string Channel { get => _channel; }
         public int Port { get => _port; }
+        public bool Connected => m_connected();
+        public int CheckConectInterval { get => _checkConnTimeSpan; set { if (value >= 5) _checkConnTimeSpan = value; } } 
+        #endregion
 
-        private bool _canConnect;
 
 
 
@@ -73,6 +88,7 @@ namespace Socket.Client
 
         }
 
+        #region CONNECTION METHODS
         public void Connect(string host, int port)
         {
             if (!_canConnect)
@@ -80,7 +96,7 @@ namespace Socket.Client
             try
             {
                 _threadKill = false;
-                _tcpClient.Connect(host, port);                
+                _tcpClient.Connect(host, port);
                 OnConnected?.Invoke(this);
             }
             catch (Exception ex)
@@ -96,7 +112,37 @@ namespace Socket.Client
             m_handShake();
         }
 
-       
+        public void Reconnect(int times)
+        {
+            Disconnect();
+
+            _ = Task.Run(async () =>
+            {
+                int cur = 0;
+
+                while (!m_connected() && cur < times)
+                {
+                    Task.Delay(1000);
+
+                    Connect(_host, _port);
+
+                    cur++;
+                }
+
+                if (m_connected())
+                {
+                    OnReconnected?.Invoke(this);
+                }
+                else
+                {
+                    OnReconnectFail?.Invoke(this);
+                }
+            });
+
+
+        }
+
+
         public void Disconnect()
         {
             if (m_connected())
@@ -113,7 +159,7 @@ namespace Socket.Client
 
             try
             {
-                _thread.Abort();                
+                _thread.Abort();
 
             }
             catch
@@ -125,7 +171,9 @@ namespace Socket.Client
             _canConnect = true;
             OnDisconnected?.Invoke(this);
         }
+        #endregion
 
+        #region MESSAGE METHODS
         public void SendMessageTo(string msg, string Uid)
         {
             try
@@ -176,7 +224,9 @@ namespace Socket.Client
 
             }
         }
+        #endregion
 
+        #region PUBLIC METHODS
         public void SetGuid(string uName, string uGuid)
         {
             _username = uName;
@@ -192,7 +242,7 @@ namespace Socket.Client
         {
             Message message = m_crMessage("see all");
             message.Channel = _channel;
-            message.Header = Headers.GET_PARTS_CHANNEL;            
+            message.Header = Headers.GET_PARTS_CHANNEL;
             SendMessage(message);
         }
 
@@ -212,6 +262,11 @@ namespace Socket.Client
             message.Body = new Messages.Body.ChangeChannelBody { From = _channel, To = chnName }.ToJson();
             SendMessage(message);
         }
+        #endregion
+
+
+
+        #region PRIVATE METHODS
         private void m_start()
         {
             if (_thread != null && _thread.IsAlive)
@@ -306,37 +361,9 @@ namespace Socket.Client
                 }
             }
 
-        Exit: 
+        Exit:
             {
                 _threadKill = false;
-            }
-        }
-
-        private void m_dsCon()
-        {
-            if (DateTime.Now.Subtract(_lastPing).TotalSeconds > 10)
-            {
-                _lastPing = DateTime.Now;
-                _lastStatus = m_connected();
-                OnConnectionCheckedAsync?.Invoke(_lastStatus, _lastPing);
-            }            
-        }
-        private bool m_connected()
-        {
-            if (_network == null)
-                return false;
-            try
-            {
-                bool s = _network.Socket.Poll(1000, SelectMode.SelectRead);
-                bool d = (_network.Socket.Available == 0);
-                if (s && d)
-                    return false;
-                else
-                    return true;
-            }
-            catch
-            {
-                return false;
             }
         }
 
@@ -366,11 +393,41 @@ namespace Socket.Client
             return true;
         }
 
+        private void m_dsCon()
+        {
+            if (DateTime.Now.Subtract(_lastPing).TotalSeconds > _checkConnTimeSpan)
+            {
+                _lastPing = DateTime.Now;
+                _lastStatus = m_connected();
+                OnConnectionCheckedAsync?.Invoke(_lastStatus, _lastPing);
+            }
+        }
+        private bool m_connected()
+        {
+            if (_network == null)
+                return false;
+            try
+            {
+                bool s = _network.Socket.Poll(1000, SelectMode.SelectRead);
+                bool d = (_network.Socket.Available == 0);
+                if (s && d)
+                    return false;
+                else
+                    return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
         private bool m_NuInChanel(Message msg)
         {
             if (msg.Header == Headers.USER_ENTERED_ROOM)
             {
-                OnNewSocketEnterInTheChannel?.Invoke(msg);
+                UserEnterOrLeaveTheChannelBody body = msg.Body.FromJson<UserEnterOrLeaveTheChannelBody>();
+                OnNewSocketEnterInTheChannel?.Invoke(body, msg.ChannelsParts);
 
                 return false;
             }
@@ -382,7 +439,7 @@ namespace Socket.Client
         {
             if (msg.Header == Headers.GET_PARTS_CHANNEL)
             {
-                OnPartsOfChannelUpdated?.Invoke(msg.ChannelsParts, msg.Channel,  this);
+                OnPartsOfChannelUpdated?.Invoke(msg.ChannelsParts, msg.Channel, this);
 
                 return false;
             }
@@ -394,7 +451,9 @@ namespace Socket.Client
         {
             if (msg.Header == Headers.USER_LEFT_ROOM)
             {
-                OnSocketLeftInTheChannel?.Invoke(msg);
+                UserEnterOrLeaveTheChannelBody body = msg.Body.FromJson<UserEnterOrLeaveTheChannelBody>();
+
+                OnSocketLeftInTheChannel?.Invoke(body, msg.ChannelsParts);
 
                 return false;
             }
@@ -406,7 +465,7 @@ namespace Socket.Client
         private bool m_reqAllChannels(Message msg)
         {
             if (msg.Header == Headers.GET_ALL_CHANNEL)
-            {                
+            {
                 OnReceiveChannelsInfo?.Invoke(msg.Body.FromJson<RequestChannelsInfoBody>(), this);
 
                 return false;
@@ -453,6 +512,7 @@ namespace Socket.Client
             }
 
             return true;
-        }
+        } 
+        #endregion
     }
 }

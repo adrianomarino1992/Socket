@@ -52,6 +52,11 @@ namespace s_wf_c
         private void _socket_OnHandShakeDone(Socket.Messages.Message arg1, SocketC arg2)
         {
             this.Hide();
+
+            _socket.OnConnected -= _socket_OnConnected;
+            _socket.OnHandShakeDone -= _socket_OnHandShakeDone;
+            _socket.OnConnectionFail -= _socket_OnConnectionFail;
+
             _ = Task.Run(async () => {
 
                 await Task.Delay(500);

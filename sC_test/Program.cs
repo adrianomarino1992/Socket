@@ -14,67 +14,20 @@ namespace cC_test
         {
             Console.WriteLine("Username:");
 
-            SocketC s = new SocketC(Console.ReadLine());
-            
+            SocketC s = new SocketC(Console.ReadLine());            
             
             s.OnMessageReceived += S_OnMessageReceived;
             s.OnConnected += S_OnConnected;
             s.OnDisconnected += S_OnDisconnected;
             s.OnChannelChanged += S_OnChannelChanged;
-            s.OnNewSocketEnterInTheChannel += S_OnNewSocketEnterInTheChannel;
-            s.OnSocketLeftInTheChannel += S_OnSocketLeftInTheChannel;
             s.OnConnectionCheckedAsync += S_OnConnectionCheckedAsync;
             s.OnConnectionFail += S_OnConnectionFail;
             s.Connect("127.0.0.1", 1236);
+        }
 
-            while(true)
-            {
-                string ss = Console.ReadLine();
-
-                if (ss == "s")
-                {
-                    s.Disconnect();
-
-                    Console.ReadLine();
-
-                    goto Exit;
-                }
-
-                if (ss == "c")
-                {
-                    s.ChangeChannel("novo");
-
-                    goto Exit;
-
-                }
-
-                if (ss.StartsWith("-p"))
-                {
-                    s.SendMessageTo("privadinhaaa", ss.Replace("-p",""));
-
-                    goto Exit;
-
-                }
-
-                if (ss.StartsWith("-e"))
-                {
-                    s.Disconnect();
-                    s.Connect("127.0.0.1", 1236);
-
-                    goto Exit;
-
-                }
-
-                s.SendMessage(ss);
-
-                Exit: 
-                
-                {
-                    
-                }
-            }
-
-
+        private static void S_OnMessageReceived(Message arg1, SocketC arg2)
+        {
+            Console.WriteLine(arg1.Body);
         }
 
         private static void S_OnConnectionFail(Exception obj)
@@ -113,10 +66,7 @@ namespace cC_test
             Console.WriteLine($"conectado como : {obj.UserName}#{obj.GUID}");
         }
 
-        private static void S_OnMessageReceived(Message arg1,SocketC arg2)
-        {
-            Console.WriteLine(arg1.Body);
-        }
+        
        
     }
 
