@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Adr.MySockets" Version="1.0.0" />
+    <PackageReference Include="Adr.MySockets" Version="1.0.1" />
   </ItemGroup>
 
 </Project>

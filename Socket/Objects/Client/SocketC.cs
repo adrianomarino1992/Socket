@@ -1,7 +1,7 @@
 ﻿using MySocket.DTO;
 using MySocket.Messages;
 using MySocket.Messages.Body;
-
+using Socket.Objects.Events;
 using System.Net.Sockets;
 
 
@@ -24,6 +24,8 @@ namespace MySocket.Client
         public event Action<RequestChannelsInfoBody, SocketC> OnReceiveChannelsInfo;
         public event Action<List<UserDTO>, string, SocketC> OnPartsOfChannelUpdated;
         public event Action<bool, DateTime> OnConnectionCheckedAsync;
+        
+        
         #endregion
 
         #region INTERNAL EVENTS
@@ -46,6 +48,7 @@ namespace MySocket.Client
         private bool _lastStatus;
         private bool _threadKill;
         private int _checkConnTimeSpan = 5;
+        private List<Socket.Objects.Events.Event> _events = new List<Socket.Objects.Events.Event>();
         #endregion
 
         #region PUBLIC PROPERTIES
@@ -72,6 +75,7 @@ namespace MySocket.Client
             m_guid();
             _tcpClient = new TcpClient();
             _canConnect = true;
+            
         }
 
 #pragma warning disable
@@ -227,6 +231,26 @@ namespace MySocket.Client
         #endregion
 
         #region PUBLIC METHODS
+
+
+        public void On(string @event, Action<Message> action, bool @continue = true, bool @onlyFromserver = true)
+        {            
+            _events.Add(new Event(@event, action, @continue, !onlyFromserver));
+        }
+
+        public void Emit(string @event, string msgStr, bool @public = false)
+        {
+            Message msg = m_crMessage(msgStr);
+            msg.Event = new Socket.DTO.EventDTO{ Name = @event, ToServer = !@public };
+            msg.Header = Headers.CUSTOM_EVENT;  
+            SendMessage(msg);
+        }
+
+        public void Blur(string @event)
+        {
+            _events.RemoveAll(d => d.Name == @event);
+        }
+
         public void SetGuid(string uName, string uGuid)
         {
             _username = uName;
@@ -390,7 +414,33 @@ namespace MySocket.Client
             if (!m_reqAllChannels(msg))
                 return false;
 
+            if (!m_evtFilter(msg))
+                return false;
+
             return true;
+        }
+
+        private bool m_evtFilter(Message msg)
+        {
+            if(msg.Event == null || string.IsNullOrEmpty(msg.Event.Name))
+            {
+                return true;
+            }
+
+            List<Event> events = _events.Where(d => d.Name == msg.Event.Name).ToList();
+
+            bool r = events.All(d => d.Continue);
+
+            events.ForEach(d => {
+                
+                if(!d.OnlyFromServer || msg.FGUID == _guid)
+                {
+                    d.Execute(msg);
+                }
+            });
+
+            return r;
+
         }
 
         private void m_dsCon()

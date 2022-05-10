@@ -8,19 +8,19 @@ Adr.MySockets is a package with classes used to facilitate the websocket communi
 .NET CLI
 
 ```bash
-dotnet add package Adr.MySockets --version 1.0.0
+dotnet add package Adr.MySockets --version 1.0.1
 ```
 
 Nuget package manager
 
 ```bash
-PM> Install-Package Adr.MySockets -Version 1.0.0
+PM> Install-Package Adr.MySockets -Version 1.0.1
 ```
 
 packageReference
 
 ```bash
-<PackageReference Include="Adr.MySockets" Version="1.0.0" />
+<PackageReference Include="Adr.MySockets" Version="1.0.1" />
 ```
 
 ## Sample of basic events only

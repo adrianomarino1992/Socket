@@ -167,6 +167,12 @@ namespace MySocket.Channel
 
             List<SocketC> tgts = _clients;
 
+            if(sender != null && !String.IsNullOrEmpty(sender.GUID))
+            {
+                codMsg.FGUID = sender.GUID.Trim();
+                codMsg.From = sender.UserName.Trim();
+            }
+
             if (!String.IsNullOrEmpty(codMsg.TGUID))
                 tgts = _clients.Where(d => d.GUID.Trim() == codMsg.TGUID.Trim()).ToList();
 

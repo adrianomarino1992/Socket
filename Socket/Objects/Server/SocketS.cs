@@ -219,9 +219,49 @@ namespace MySocket.Server
                 return false;
             }
 
+            if (codMsg.Header == Headers.CUSTOM_EVENT)
+            {
+
+                m_emitCEvt(codMsg, socketC);
+
+                return false;
+            }
+
 
             return true;
         }
+
+
+        private void m_emitCEvt(Message msg, SocketC socket)
+        {
+
+            MySocket.Channel.Channel ch = MySocket.Channel.Channel.All.Where(d => d.Contains(socket)).FirstOrDefault();
+
+            if (ch == null)
+                return;
+
+            Message emit = new Message
+            {                               
+                Event = msg.Event, 
+                Header = Headers.CUSTOM_EVENT,
+                FGUID = socket.GUID,
+                From = socket.UserName,
+                Channel = ch.Name, 
+                ChannelsParts = ch.Participants.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList(),
+                Body = msg.Body
+            };
+
+            if(msg.Event.ToServer)
+            {
+                socket.SendMessage(emit);
+            }
+            else
+            {
+                ch.BroadCast(emit, socket);
+            }
+                        
+        }
+
 
         private void m_sendAllPesChl(Message chgN, SocketC socket)
         {

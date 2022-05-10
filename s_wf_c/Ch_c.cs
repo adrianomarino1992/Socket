@@ -37,7 +37,7 @@ namespace s_wf_c
             _socket.OnPartsOfChannelUpdated += _socket_OnPartsOfChannelUpdated;
             _socket.OnReceiveChannelsInfo += _socket_OnReceiveChannelsInfo;
             _socket.OnReconnected += _socket_OnReconnected;
-            _socket.OnReconnectFail += _socket_OnReconnectFail;
+            _socket.OnReconnectFail += _socket_OnReconnectFail;            
 
             _socket.RequestOthersPartsOfChannel();
 
@@ -353,5 +353,6 @@ namespace s_wf_c
             USERLEFTTHERROM
             
         }
+       
     }
 }

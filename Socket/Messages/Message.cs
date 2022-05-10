@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using MySocket.DTO;
+using Socket.DTO;
 
 namespace MySocket.Messages
 {
@@ -12,6 +13,7 @@ namespace MySocket.Messages
     {
         public DateTime DateTime { get; set; }
         public string Header { get; set; }
+        public EventDTO Event { get; set; }        
         public string Body { get; set; }
         public string From { get; set; }
         public string FGUID { get; set; }
@@ -34,7 +36,9 @@ namespace MySocket.Messages
             return JsonSerializer.Deserialize<Message>(jMsg);
         }
 
+       
     }
 
+    
     
 }
