@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Adr.MySockets" Version="1.0.1" />
+    <ProjectReference Include="..\Socket\Socket.csproj" />
   </ItemGroup>
 
   <ItemGroup>

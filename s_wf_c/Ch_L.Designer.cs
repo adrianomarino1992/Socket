@@ -80,7 +80,7 @@
             this.txtHost.Location = new System.Drawing.Point(27, 34);
             this.txtHost.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtHost.Name = "txtHost";
-            this.txtHost.PlaceholderText = "127.0.0.1";
+            this.txtHost.PlaceholderText = "192.168.1.221";
             this.txtHost.Size = new System.Drawing.Size(123, 26);
             this.txtHost.TabIndex = 6;
             // 

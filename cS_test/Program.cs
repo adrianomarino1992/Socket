@@ -14,7 +14,7 @@ namespace cS_test
 
             Console.Title = "Server";
 
-            SocketS server = new SocketS(IPEndPoint.Parse("127.0.0.1:1236"));
+            SocketS server = new SocketS(IPEndPoint.Parse("192.168.1.4:1236"));
             
             server.OnClientAccepted += S_OnClientAccepted;
             server.OnMessageReceived += S_OnMessageReceived;

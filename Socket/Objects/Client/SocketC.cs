@@ -47,6 +47,7 @@ namespace MySocket.Client
         private DateTime _lastPing = DateTime.Now;
         private bool _lastStatus;
         private bool _threadKill;
+        private Socket.Objects.Enumerables.NetWorkImportance NetWorkImportance { get; set; } = Socket.Objects.Enumerables.NetWorkImportance.HIGH;
         private int _checkConnTimeSpan = 5;
         private List<Socket.Objects.Events.Event> _events = new List<Socket.Objects.Events.Event>();
         #endregion
@@ -91,6 +92,7 @@ namespace MySocket.Client
             m_start();
 
         }
+                
 
         #region CONNECTION METHODS
         public void Connect(string host, int port)
@@ -296,9 +298,18 @@ namespace MySocket.Client
             if (_thread != null && _thread.IsAlive)
                 throw new MySocket.Exceptions.SocketConnectionException("The server is already started");
 
+            Socket.Objects.Enumerables.NetWorkImportance curr = NetWorkImportance;
+            NetWorkImportance = Socket.Objects.Enumerables.NetWorkImportance.VERYHIGH;
+
             _thread = new Thread(m_readNetWork);
             _thread.IsBackground = true;
             _thread.Start();
+
+            _ = Task.Run(async () => { 
+                
+                await Task.Delay(1000);
+                NetWorkImportance = curr;
+            });
         }
 
         private string m_guid()
@@ -362,6 +373,8 @@ namespace MySocket.Client
                 {
                     m_dsCon();
 
+                    Thread.Sleep((int)NetWorkImportance);
+                    
                     if (_network.DataAvailable)
                     {
                         byte[] data = new byte[_tcpClient.Available];
