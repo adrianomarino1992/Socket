@@ -20,6 +20,7 @@ namespace MySocket.Client
         public event Action<SocketC> OnReconnectFail;
         public event Action<SocketC> OnDisconnected;
         public event Action<Exception> OnConnectionFail;
+        public event Action<Exception> OnReadNetWorkFail;
         public event Action<Message, SocketC> OnChannelChanged;
         public event Action<RequestChannelsInfoBody, SocketC> OnReceiveChannelsInfo;
         public event Action<List<UserDTO>, string, SocketC> OnPartsOfChannelUpdated;
@@ -47,7 +48,7 @@ namespace MySocket.Client
         private DateTime _lastPing = DateTime.Now;
         private bool _lastStatus;
         private bool _threadKill;
-        private Socket.Objects.Enumerables.NetWorkImportance NetWorkImportance { get; set; } = Socket.Objects.Enumerables.NetWorkImportance.HIGH;
+        public Socket.Objects.Enumerables.NetWorkImportance NetWorkImportance { get; set; } = Socket.Objects.Enumerables.NetWorkImportance.HIGH;
         private int _checkConnTimeSpan = 5;
         private List<Socket.Objects.Events.Event> _events = new List<Socket.Objects.Events.Event>();
         #endregion
@@ -375,13 +376,20 @@ namespace MySocket.Client
 
                     Thread.Sleep((int)NetWorkImportance);
                     
-                    if (_network.DataAvailable)
+                    List<Byte> data = new List<Byte>();
+
+                    while (_network.DataAvailable) 
                     {
-                        byte[] data = new byte[_tcpClient.Available];
+                        byte[] chunk = new byte[_tcpClient.Available];
 
-                        _network.Read(data, 0, data.Length);
+                        _network.Read(chunk, 0, chunk.Length);
 
-                        string msg = System.Text.Encoding.UTF8.GetString(data);
+                        data.AddRange(chunk); 
+                    }
+
+                    if(data.Count > 0)
+                    {
+                        string msg = System.Text.Encoding.UTF8.GetString(data.ToArray());
 
                         OnMessageArriveFromClient?.Invoke(Message.ToMessage(msg), this);
 
@@ -389,12 +397,11 @@ namespace MySocket.Client
                         {
                             OnMessageReceived?.Invoke(Message.ToMessage(msg), this);
                         }
-
                     }
                 }
-                catch
+                catch(Exception ex)
                 {
-
+                    OnReadNetWorkFail?.Invoke(ex);
                 }
             }
 
