@@ -101,7 +101,6 @@
             this.lblChannel.Size = new System.Drawing.Size(47, 18);
             this.lblChannel.TabIndex = 5;
             this.lblChannel.Text = "Channel";
-            this.lblChannel.Click += new System.EventHandler(this.lblChannel_Click);
             // 
             // lblStatus
             // 
@@ -173,7 +172,6 @@
             this.MinimumSize = new System.Drawing.Size(937, 580);
             this.Name = "Ch_c";
             this.Text = "Chat";
-            this.Load += new System.EventHandler(this.Ch_c_Load);
             ((System.ComponentModel.ISupportInitialize)(this.btnRequestChannels)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

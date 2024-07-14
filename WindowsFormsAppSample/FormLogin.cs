@@ -40,22 +40,22 @@ namespace s_wf_c
             int port = int.Parse(ports);
 
             _socket = new SocketClient(user);
-            _socket.OnConnected += _socket_OnConnected;
-            _socket.OnHandShakeDone += _socket_OnHandShakeDone;
-            _socket.OnConnectionFail += _socket_OnConnectionFail;
+            _socket.OnConnected += OnConnectedHandle;
+            _socket.OnHandShakeDone += OnHandShakeDoneHandle;
+            _socket.OnConnectionFail += OnConnectionFailHandle;
             
             _socket.Connect(host.Trim(), port);
         }
 
         
 
-        private void _socket_OnHandShakeDone(MySocket.Messages.Message arg1, SocketClient arg2)
+        private void OnHandShakeDoneHandle(MySocket.Messages.Message arg1, SocketClient arg2)
         {
             this.Hide();
 
-            _socket.OnConnected -= _socket_OnConnected;
-            _socket.OnHandShakeDone -= _socket_OnHandShakeDone;
-            _socket.OnConnectionFail -= _socket_OnConnectionFail;
+            _socket.OnConnected -= OnConnectedHandle;
+            _socket.OnHandShakeDone -= OnHandShakeDoneHandle;
+            _socket.OnConnectionFail -= OnConnectionFailHandle;
 
             _ = Task.Run(async () => {
 
@@ -70,12 +70,12 @@ namespace s_wf_c
             });
         }
 
-        private void _socket_OnConnectionFail(Exception obj)
+        private void OnConnectionFailHandle(Exception obj)
         {
             lblInfo.Text = "Fail on stablish a connection";
         }
 
-        private void _socket_OnConnected(SocketClient obj)
+        private void OnConnectedHandle(SocketClient obj)
         {
             lblInfo.Text = "Connected";
         }

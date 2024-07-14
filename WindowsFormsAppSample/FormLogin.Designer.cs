@@ -80,7 +80,7 @@
             this.txtHost.Location = new System.Drawing.Point(27, 34);
             this.txtHost.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtHost.Name = "txtHost";
-            this.txtHost.PlaceholderText = "192.168.1.221";
+            this.txtHost.PlaceholderText = "192.168.15.93";
             this.txtHost.Size = new System.Drawing.Size(123, 26);
             this.txtHost.TabIndex = 6;
             // 
@@ -96,7 +96,7 @@
             this.lblInfo.Size = new System.Drawing.Size(189, 24);
             this.lblInfo.TabIndex = 10;
             // 
-            // Ch_L
+            // FormLogin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -112,7 +112,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "Ch_L";
+            this.Name = "FormLogin";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Login";
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider)).EndInit();

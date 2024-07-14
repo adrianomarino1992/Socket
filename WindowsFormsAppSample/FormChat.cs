@@ -28,37 +28,37 @@ namespace s_wf_c
             lblChannel.Text = _socket.Channel;
             lblUser.Text = $"{_socket.UserName}#{_socket.GUID}";
 
-            _socket.OnChannelChanged += _socket_OnChannelChanged;
-            _socket.OnHandShakeDone += _socket_OnHandShakeDone;
-            _socket.OnMessageReceived += _socket_OnMessageReceived;
-            _socket.OnNewSocketEnterInTheChannel += _socket_OnNewSocketEnterInTheChannel;
-            _socket.OnSocketLeftInTheChannel += _socket_OnSocketLeftInTheChannel;
-            _socket.OnConnectionCheckedAsync += _socket_OnConnectionCheckedAsync;
-            _socket.OnPartsOfChannelUpdated += _socket_OnPartsOfChannelUpdated;
-            _socket.OnReceiveChannelsInfo += _socket_OnReceiveChannelsInfo;
-            _socket.OnReconnected += _socket_OnReconnected;
-            _socket.OnReconnectFail += _socket_OnReconnectFail;            
+            _socket.OnChannelChanged += OnChannelChangedHandle;
+            _socket.OnHandShakeDone += OnHandShakeDoneHandle;
+            _socket.OnMessageReceived += OnMessageReceivedHandle;
+            _socket.OnNewSocketEnterInTheChannel += OnNewSocketEnterInTheChannelHandle;
+            _socket.OnSocketLeftInTheChannel += OnSocketLeftInTheChannelHandle;
+            _socket.OnConnectionCheckedAsync += OnConnectionCheckedAsyncHandle;
+            _socket.OnPartsOfChannelUpdated += OnPartsOfChannelUpdatedHandle;
+            _socket.OnReceiveChannelsInfo += OnReceiveChannelsInfoHandle;
+            _socket.OnReconnected += OnReconnectedHandle;
+            _socket.OnReconnectFail += OnReconnectFailHandle;            
 
             _socket.RequestOthersPartsOfChannel();
 
         }
 
-        private void _socket_OnReconnectFail(SocketClient obj)
+        private void OnReconnectFailHandle(SocketClient obj)
         {
-            m_onMainT(() =>
+            ExecuteOnMainThread(() =>
             {
-                m_addMessage("Fail on reconnect to the server", $"Last try in {DateTime.Now}", MsgTypes.CHANGECHANNEL);
+                AddMessage("Fail on reconnect to the server", $"Last try in {DateTime.Now}", MsgTypes.CHANGECHANNEL);
                 lblStatus.Text = $"Fail on reconnect to the server: {DateTime.Now}";
                 lblStatus.ForeColor = Color.Red;
             });
         }
 
-        private void _socket_OnReconnected(SocketClient obj)
+        private void OnReconnectedHandle(SocketClient obj)
         {
-            m_addMessage("Reconnected to the server", $"Reconnected in {DateTime.Now}", MsgTypes.CHANGECHANNEL);
+            AddMessage("Reconnected to the server", $"Reconnected in {DateTime.Now}", MsgTypes.CHANGECHANNEL);
         }
 
-        private void _socket_OnReceiveChannelsInfo(MySocket.Messages.Body.RequestChannelsInfoBody arg1, SocketClient arg2)
+        private void OnReceiveChannelsInfoHandle(MySocket.Messages.Body.RequestChannelsInfoBody arg1, SocketClient arg2)
         {
 
             FormSelectChannel lg = new FormSelectChannel(arg1);
@@ -81,9 +81,9 @@ namespace s_wf_c
             }
         }
 
-        private void _socket_OnPartsOfChannelUpdated(List<UserDTO> arg1, string arg2, SocketClient arg3)
+        private void OnPartsOfChannelUpdatedHandle(List<UserDTO> arg1, string arg2, SocketClient arg3)
         {
-            m_onMainT(() =>
+            ExecuteOnMainThread(() =>
             {
                 lblChannel.Text = arg2;
 
@@ -105,9 +105,9 @@ namespace s_wf_c
         }
 
 
-        private void _socket_OnSocketLeftInTheChannel(MySocket.Messages.Body.UserEnterOrLeaveTheChannelBody body, List<UserDTO> users)
+        private void OnSocketLeftInTheChannelHandle(MySocket.Messages.Body.UserEnterOrLeaveTheChannelBody body, List<UserDTO> users)
         {
-            m_onMainT(() =>
+            ExecuteOnMainThread(() =>
             {
                 lvlUser.Items.Clear();
 
@@ -116,14 +116,14 @@ namespace s_wf_c
                     lvlUser.Items.Add($"{p.Name}#{p.GUID}");
                 }
 
-                m_addMessage($"{body.Name} left the room", $"Left in {DateTime.Now}", MsgTypes.USERLEFTTHERROM);
+                AddMessage($"{body.Name} left the room", $"Left in {DateTime.Now}", MsgTypes.USERLEFTTHERROM);
 
             });
         }
 
-        private void _socket_OnNewSocketEnterInTheChannel(MySocket.Messages.Body.UserEnterOrLeaveTheChannelBody body, List<UserDTO> users)
+        private void OnNewSocketEnterInTheChannelHandle(MySocket.Messages.Body.UserEnterOrLeaveTheChannelBody body, List<UserDTO> users)
         {
-            m_onMainT(() =>
+            ExecuteOnMainThread(() =>
             {
                 lvlUser.Items.Clear();
 
@@ -132,24 +132,21 @@ namespace s_wf_c
                     lvlUser.Items.Add($"{p.Name}#{p.GUID}");
                 }
 
-                m_addMessage($"{body.Name} joined in the room", $"Joined in {DateTime.Now}", MsgTypes.USERENTEREDTHEROOM);
+                AddMessage($"{body.Name} joined in the room", $"Joined in {DateTime.Now}", MsgTypes.USERENTEREDTHEROOM);
             });
         }
 
-        private void _socket_OnMessageReceived(MySocket.Messages.Message arg1, SocketClient arg2)
+        private void OnMessageReceivedHandle(MySocket.Messages.Message arg1, SocketClient arg2)
         {
-            m_onMainT(() =>
+            ExecuteOnMainThread(() =>
             {
                 if(arg1.TGUID == lblUser.Text.Split('#')[1])
                 {
-                    m_addMessage($"Private from {arg1.From}: {arg1.Body}", $"Received in {DateTime.Now}", MsgTypes.PRIVATE);
-
-
+                    AddMessage($"Private from {arg1.From}: {arg1.Body}", $"Received in {DateTime.Now}", MsgTypes.PRIVATE);
                 }
                 else {
 
-                    m_addMessage($"{arg1.From}: {arg1.Body}", $"Received in {DateTime.Now}", MsgTypes.FROMOTHERUSER);
-
+                    AddMessage($"{arg1.From}: {arg1.Body}", $"Received in {DateTime.Now}", MsgTypes.FROMOTHERUSER);
                 }
 
 
@@ -158,9 +155,9 @@ namespace s_wf_c
 
         }
 
-        private void _socket_OnHandShakeDone(MySocket.Messages.Message arg1, SocketClient arg2)
+        private void OnHandShakeDoneHandle(MySocket.Messages.Message arg1, SocketClient arg2)
         {
-            m_onMainT(() =>
+            ExecuteOnMainThread(() =>
             {                
 
                 lvlUser.Items.Clear();
@@ -172,9 +169,9 @@ namespace s_wf_c
             });
         }
 
-        private void _socket_OnConnectionCheckedAsync(bool arg1, DateTime arg2)
+        private void OnConnectionCheckedAsyncHandle(bool arg1, DateTime arg2)
         {
-            m_onMainT(() =>
+            ExecuteOnMainThread(() =>
             {
                 if (arg1)
                 {
@@ -191,12 +188,12 @@ namespace s_wf_c
 
         }
 
-        private void _socket_OnChannelChanged(MySocket.Messages.Message arg1, SocketClient arg2)
+        private void OnChannelChangedHandle(MySocket.Messages.Message arg1, SocketClient arg2)
         {
-            m_onMainT(() =>
+            ExecuteOnMainThread(() =>
             {
                 lvMsg.Items.Clear();
-                m_addMessage($"Changed to channel: {arg1.Channel}", $"Changed in {DateTime.Now}", MsgTypes.CHANGECHANNEL);
+                AddMessage($"Changed to channel: {arg1.Channel}", $"Changed in {DateTime.Now}", MsgTypes.CHANGECHANNEL);
                 
                 lblChannel.Text = arg1.Channel;
             });
@@ -207,15 +204,15 @@ namespace s_wf_c
             if (String.IsNullOrEmpty(txtMsg.Text.Trim()))
                 return;
 
-            string uid = m_getUid();
+            string uid = GetUID();
             if(String.IsNullOrEmpty(uid) && uid != lblUser.Text.Split('#')[1])
             {
-                m_addMessage($"You: {txtMsg.Text.Trim()}", $"Sent in {DateTime.Now}", MsgTypes.FROMTHISUSER);
+                AddMessage($"You: {txtMsg.Text.Trim()}", $"Sent in {DateTime.Now}", MsgTypes.FROMTHISUSER);
                 _socket.SendMessage(txtMsg.Text);
             }
             else
             {
-                m_addMessage($"Private to {m_getUser(uid)}: {txtMsg.Text.Trim()}", $"Sent in {DateTime.Now}", MsgTypes.PRIVATE);
+                AddMessage($"Private to {GetUserFromGUID(uid)}: {txtMsg.Text.Trim()}", $"Sent in {DateTime.Now}", MsgTypes.PRIVATE);
                 _socket.SendMessageTo(txtMsg.Text, uid);
             }
 
@@ -224,7 +221,7 @@ namespace s_wf_c
             txtMsg.Text = String.Empty;
         }
 
-        private string m_getUser(string uid)
+        private string GetUserFromGUID(string uid)
         {
             foreach (string u in lvlUser.Items)
             {
@@ -236,7 +233,7 @@ namespace s_wf_c
             return String.Empty;
         }
 
-        private string m_getUid()
+        private string GetUID()
         {
             if(txtMsg.Text.Length > 8)
             {
@@ -261,15 +258,12 @@ namespace s_wf_c
             }
         }
 
-        private void m_onMainT(Action action)
+        private void ExecuteOnMainThread(Action action)
         {
             this.Invoke(new Action(action));
         }
 
-        private void Ch_c_Load(object sender, EventArgs e)
-        {
-
-        }
+       
 
         private void lblChannel_Click(object sender, EventArgs e)
         {
@@ -290,7 +284,7 @@ namespace s_wf_c
             catch { }
         }
 
-        private void m_addMessage(string msg, string tooltip, MsgTypes type)
+        private void AddMessage(string msg, string tooltip, MsgTypes type)
         {
             Color colorB = Color.White;
             Color colorF = Color.Black;
@@ -338,7 +332,7 @@ namespace s_wf_c
                     break;
             }
 
-            lvMsg.Items.Add(new ListViewItem { Text = msg, BackColor = colorB, ForeColor = colorF, ToolTipText = tooltip }).Focused = true;
+            lvMsg.Items.Add(new ListViewItem { Text = $"{DateTime.Now.ToShortTimeString()} - " +  msg, BackColor = colorB, ForeColor = colorF, ToolTipText = tooltip }).Focused = true;
 
         }
 
