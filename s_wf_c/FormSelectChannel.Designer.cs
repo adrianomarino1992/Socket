@@ -1,6 +1,6 @@
 ﻿namespace s_wf_c
 {
-    partial class Ch_ch
+    partial class FormSelectChannel
     {
         /// <summary>
         /// Required designer variable.

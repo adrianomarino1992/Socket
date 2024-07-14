@@ -7,30 +7,30 @@ using System.Net.Sockets;
 
 namespace MySocket.Client
 {
-    public class SocketC
+    public class SocketClient
     {
 
         #region EVENTS
-        public event Action<Message, SocketC> OnMessageReceived;
+        public event Action<Message, SocketClient> OnMessageReceived;
         public event Action<UserEnterOrLeaveTheChannelBody, List<UserDTO>> OnNewSocketEnterInTheChannel;
         public event Action<UserEnterOrLeaveTheChannelBody, List<UserDTO>> OnSocketLeftInTheChannel;
-        public event Action<Message, SocketC> OnHandShakeDone;
-        public event Action<SocketC> OnConnected;
-        public event Action<SocketC> OnReconnected;
-        public event Action<SocketC> OnReconnectFail;
-        public event Action<SocketC> OnDisconnected;
+        public event Action<Message, SocketClient> OnHandShakeDone;
+        public event Action<SocketClient> OnConnected;
+        public event Action<SocketClient> OnReconnected;
+        public event Action<SocketClient> OnReconnectFail;
+        public event Action<SocketClient> OnDisconnected;
         public event Action<Exception> OnConnectionFail;
         public event Action<Exception> OnReadNetWorkFail;
-        public event Action<Message, SocketC> OnChannelChanged;
-        public event Action<RequestChannelsInfoBody, SocketC> OnReceiveChannelsInfo;
-        public event Action<List<UserDTO>, string, SocketC> OnPartsOfChannelUpdated;
+        public event Action<Message, SocketClient> OnChannelChanged;
+        public event Action<RequestChannelsInfoBody, SocketClient> OnReceiveChannelsInfo;
+        public event Action<List<UserDTO>, string, SocketClient> OnPartsOfChannelUpdated;
         public event Action<bool, DateTime> OnConnectionCheckedAsync;
         
         
         #endregion
 
         #region INTERNAL EVENTS
-        internal event Action<Message, SocketC> OnMessageArriveFromClient;
+        internal event Action<Message, SocketClient> OnMessageArriveFromClient;
         #endregion
 
 
@@ -59,7 +59,7 @@ namespace MySocket.Client
         public string Host { get => _host; }
         public string Channel { get => _channel; }
         public int Port { get => _port; }
-        public bool Connected => m_connected();
+        public bool Connected => IsConnected();
         public int CheckConectInterval { get => _checkConnTimeSpan; set { if (value >= 5) _checkConnTimeSpan = value; } } 
         #endregion
 
@@ -67,21 +67,21 @@ namespace MySocket.Client
 
 
 #pragma warning disable
-        public SocketC(string userName)
+        public SocketClient(string userName)
         {
 #pragma warning enable
             if (String.IsNullOrEmpty(userName))
                 throw new ArgumentNullException("The username is required");
 
             _username = userName;
-            m_guid();
+            CreateGUID();
             _tcpClient = new TcpClient();
             _canConnect = true;
             
         }
 
 #pragma warning disable
-        public SocketC(TcpClient tcpClient)
+        public SocketClient(TcpClient tcpClient)
         {
 #pragma warning enable
             if (!tcpClient.Connected)
@@ -90,7 +90,7 @@ namespace MySocket.Client
             _tcpClient = tcpClient;
             _network = tcpClient.GetStream();
             _canConnect = false;            
-            m_start();
+            Start();
 
         }
                 
@@ -115,8 +115,8 @@ namespace MySocket.Client
             _network = _tcpClient.GetStream();
             _host = host;
             _port = port;
-            m_start();
-            m_handShake();
+            Start();
+            DoHandShake();
         }
 
         public void Reconnect(int times)
@@ -127,7 +127,7 @@ namespace MySocket.Client
             {
                 int cur = 0;
 
-                while (!m_connected() && cur < times)
+                while (!IsConnected() && cur < times)
                 {
                     Task.Delay(1000);
 
@@ -136,7 +136,7 @@ namespace MySocket.Client
                     cur++;
                 }
 
-                if (m_connected())
+                if (IsConnected())
                 {
                     OnReconnected?.Invoke(this);
                 }
@@ -152,9 +152,9 @@ namespace MySocket.Client
 
         public void Disconnect()
         {
-            if (m_connected())
+            if (IsConnected())
             {
-                Message msg = m_crMessage("Disconnect");
+                Message msg = CreateMessage("Disconnect");
                 msg.Header = Headers.DISCONNECT;
                 SendMessage(msg);
             }
@@ -187,7 +187,7 @@ namespace MySocket.Client
             {
                 if (_isAlive)
                 {
-                    Message m = m_crMessage(msg);
+                    Message m = CreateMessage(msg);
                     m.TGUID = Uid;
                     byte[] data = System.Text.Encoding.UTF8.GetBytes(m.ToString());
                     _network.Write(data, 0, data.Length);
@@ -206,7 +206,7 @@ namespace MySocket.Client
             {
                 if (_isAlive)
                 {
-                    byte[] data = System.Text.Encoding.UTF8.GetBytes(m_crMessage(msg).ToString());
+                    byte[] data = System.Text.Encoding.UTF8.GetBytes(CreateMessage(msg).ToString());
                     _network.Write(data, 0, data.Length);
                 }
             }
@@ -243,7 +243,7 @@ namespace MySocket.Client
 
         public void Emit(string @event, string msgStr, bool @public = false)
         {
-            Message msg = m_crMessage(msgStr);
+            Message msg = CreateMessage(msgStr);
             msg.Event = new Socket.DTO.EventDTO{ Name = @event, ToServer = !@public };
             msg.Header = Headers.CUSTOM_EVENT;  
             SendMessage(msg);
@@ -267,7 +267,7 @@ namespace MySocket.Client
 
         public void RequestOthersPartsOfChannel()
         {
-            Message message = m_crMessage("see all");
+            Message message = CreateMessage("see all");
             message.Channel = _channel;
             message.Header = Headers.GET_PARTS_CHANNEL;
             SendMessage(message);
@@ -275,7 +275,7 @@ namespace MySocket.Client
 
         public void RequestAllChannels()
         {
-            Message message = m_crMessage("get all");
+            Message message = CreateMessage("get all");
             message.Channel = _channel;
             message.Header = Headers.GET_ALL_CHANNEL;
             SendMessage(message);
@@ -283,7 +283,7 @@ namespace MySocket.Client
 
         public void ChangeChannel(string chnName)
         {
-            Message message = m_crMessage("change channel");
+            Message message = CreateMessage("change channel");
             message.Channel = chnName;
             message.Header = Headers.CHANGE_CHANNEL;
             message.Body = new Messages.Body.ChangeChannelBody { From = _channel, To = chnName }.ToJson();
@@ -294,7 +294,7 @@ namespace MySocket.Client
 
 
         #region PRIVATE METHODS
-        private void m_start()
+        private void Start()
         {
             if (_thread != null && _thread.IsAlive)
                 throw new MySocket.Exceptions.SocketConnectionException("The server is already started");
@@ -302,7 +302,7 @@ namespace MySocket.Client
             Socket.Objects.Enumerables.NetWorkImportance curr = NetWorkImportance;
             NetWorkImportance = Socket.Objects.Enumerables.NetWorkImportance.VERYHIGH;
 
-            _thread = new Thread(m_readNetWork);
+            _thread = new Thread(HandleNetworkStream);
             _thread.IsBackground = true;
             _thread.Start();
 
@@ -313,14 +313,14 @@ namespace MySocket.Client
             });
         }
 
-        private string m_guid()
+        private string CreateGUID()
         {
             _guid = new string(Guid.NewGuid().ToString().Take(5).ToArray());
 
             return _guid;
         }
 
-        private Message m_crMessage(string msg)
+        private Message CreateMessage(string msg)
         {
             return new Message
             {
@@ -333,7 +333,7 @@ namespace MySocket.Client
             };
         }
 
-        private void m_handShake()
+        private void DoHandShake()
         {
             try
             {
@@ -363,7 +363,7 @@ namespace MySocket.Client
 
         }
 
-        private void m_readNetWork()
+        private void HandleNetworkStream()
         {
 
             while (_isAlive)
@@ -372,7 +372,7 @@ namespace MySocket.Client
                     goto Exit;
                 try
                 {
-                    m_dsCon();
+                    CheckConnection();
 
                     Thread.Sleep((int)NetWorkImportance);
                     
@@ -393,7 +393,7 @@ namespace MySocket.Client
 
                         OnMessageArriveFromClient?.Invoke(Message.ToMessage(msg), this);
 
-                        if (m_checkPrivMssg(Message.ToMessage(msg)))
+                        if (HandleInternalMessage(Message.ToMessage(msg)))
                         {
                             OnMessageReceived?.Invoke(Message.ToMessage(msg), this);
                         }
@@ -411,36 +411,38 @@ namespace MySocket.Client
             }
         }
 
-        private bool m_checkPrivMssg(Message msg)
+
+
+        private bool HandleInternalMessage(Message msg)
         {
-            if (!m_checkHandS(msg))
+            if (!CheckHandShake(msg))
                 return false;
 
-            if (!m_setChanel(msg))
+            if (!SetChannel(msg))
                 return false;
 
-            if (!m_changeChanel(msg))
+            if (!ChangeChannel(msg))
                 return false;
 
-            if (!m_NuInChanel(msg))
+            if (!NewUserInChannel(msg))
                 return false;
 
-            if (!m_NuOutChanel(msg))
+            if (!LeftChannel(msg))
                 return false;
 
-            if (!m_PartsChannelUp(msg))
+            if (!PartsChannelUpdate(msg))
                 return false;
 
-            if (!m_reqAllChannels(msg))
+            if (!RequestAllChannels(msg))
                 return false;
 
-            if (!m_evtFilter(msg))
+            if (!EventFilter(msg))
                 return false;
 
             return true;
         }
 
-        private bool m_evtFilter(Message msg)
+        private bool EventFilter(Message msg)
         {
             if(msg.Event == null || string.IsNullOrEmpty(msg.Event.Name))
             {
@@ -463,16 +465,16 @@ namespace MySocket.Client
 
         }
 
-        private void m_dsCon()
+        private void CheckConnection()
         {
             if (DateTime.Now.Subtract(_lastPing).TotalSeconds > _checkConnTimeSpan)
             {
                 _lastPing = DateTime.Now;
-                _lastStatus = m_connected();
+                _lastStatus = IsConnected();
                 OnConnectionCheckedAsync?.Invoke(_lastStatus, _lastPing);
             }
         }
-        private bool m_connected()
+        private bool IsConnected()
         {
             if (_network == null)
                 return false;
@@ -492,7 +494,7 @@ namespace MySocket.Client
         }
 
 
-        private bool m_NuInChanel(Message msg)
+        private bool NewUserInChannel(Message msg)
         {
             if (msg.Header == Headers.USER_ENTERED_ROOM)
             {
@@ -505,7 +507,7 @@ namespace MySocket.Client
             return true;
         }
 
-        private bool m_PartsChannelUp(Message msg)
+        private bool PartsChannelUpdate(Message msg)
         {
             if (msg.Header == Headers.GET_PARTS_CHANNEL)
             {
@@ -517,7 +519,7 @@ namespace MySocket.Client
             return true;
         }
 
-        private bool m_NuOutChanel(Message msg)
+        private bool LeftChannel(Message msg)
         {
             if (msg.Header == Headers.USER_LEFT_ROOM)
             {
@@ -532,7 +534,7 @@ namespace MySocket.Client
         }
 
 
-        private bool m_reqAllChannels(Message msg)
+        private bool RequestAllChannels(Message msg)
         {
             if (msg.Header == Headers.GET_ALL_CHANNEL)
             {
@@ -544,7 +546,7 @@ namespace MySocket.Client
             return true;
         }
 
-        private bool m_changeChanel(Message msg)
+        private bool ChangeChannel(Message msg)
         {
             if (msg.Header == Headers.CHANGE_CHANNEL)
             {
@@ -558,7 +560,7 @@ namespace MySocket.Client
             return true;
         }
 
-        private bool m_setChanel(Message msg)
+        private bool SetChannel(Message msg)
         {
             if (msg.Header == Headers.SET_CHANNEL)
             {
@@ -570,7 +572,7 @@ namespace MySocket.Client
             return true;
         }
 
-        private bool m_checkHandS(Message msg)
+        private bool CheckHandShake(Message msg)
         {
             if (msg.Header == Headers.HANDSHAKE)
             {

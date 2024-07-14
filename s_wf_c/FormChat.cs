@@ -5,10 +5,10 @@ using System.ComponentModel;
 
 namespace s_wf_c
 {
-    public partial class Ch_c : Form
+    public partial class FormChat : Form
     {
-        private SocketC _socket;
-        public Ch_c(SocketC socket)
+        private SocketClient _socket;
+        public FormChat(SocketClient socket)
         {
             InitializeComponent();
             _socket = socket;
@@ -43,7 +43,7 @@ namespace s_wf_c
 
         }
 
-        private void _socket_OnReconnectFail(SocketC obj)
+        private void _socket_OnReconnectFail(SocketClient obj)
         {
             m_onMainT(() =>
             {
@@ -53,15 +53,15 @@ namespace s_wf_c
             });
         }
 
-        private void _socket_OnReconnected(SocketC obj)
+        private void _socket_OnReconnected(SocketClient obj)
         {
             m_addMessage("Reconnected to the server", $"Reconnected in {DateTime.Now}", MsgTypes.CHANGECHANNEL);
         }
 
-        private void _socket_OnReceiveChannelsInfo(MySocket.Messages.Body.RequestChannelsInfoBody arg1, SocketC arg2)
+        private void _socket_OnReceiveChannelsInfo(MySocket.Messages.Body.RequestChannelsInfoBody arg1, SocketClient arg2)
         {
 
-            Ch_ch lg = new Ch_ch(arg1);
+            FormSelectChannel lg = new FormSelectChannel(arg1);
 
             if (lg.ShowDialog() == DialogResult.OK)
             {
@@ -81,7 +81,7 @@ namespace s_wf_c
             }
         }
 
-        private void _socket_OnPartsOfChannelUpdated(List<UserDTO> arg1, string arg2, SocketC arg3)
+        private void _socket_OnPartsOfChannelUpdated(List<UserDTO> arg1, string arg2, SocketClient arg3)
         {
             m_onMainT(() =>
             {
@@ -136,7 +136,7 @@ namespace s_wf_c
             });
         }
 
-        private void _socket_OnMessageReceived(MySocket.Messages.Message arg1, SocketC arg2)
+        private void _socket_OnMessageReceived(MySocket.Messages.Message arg1, SocketClient arg2)
         {
             m_onMainT(() =>
             {
@@ -158,7 +158,7 @@ namespace s_wf_c
 
         }
 
-        private void _socket_OnHandShakeDone(MySocket.Messages.Message arg1, SocketC arg2)
+        private void _socket_OnHandShakeDone(MySocket.Messages.Message arg1, SocketClient arg2)
         {
             m_onMainT(() =>
             {                
@@ -191,7 +191,7 @@ namespace s_wf_c
 
         }
 
-        private void _socket_OnChannelChanged(MySocket.Messages.Message arg1, SocketC arg2)
+        private void _socket_OnChannelChanged(MySocket.Messages.Message arg1, SocketClient arg2)
         {
             m_onMainT(() =>
             {

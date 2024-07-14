@@ -8,18 +8,18 @@ using System.Net.Sockets;
 
 namespace MySocket.Server
 {
-    public class SocketS
+    public class SocketServer
     {
         #region EVENTS
 
-        public event Action<SocketC> OnClientAccepted;
-        public event Action<SocketC> OnClientDisconnect;
-        public event Action<MySocket.Server.SocketS> OnServerUp;
-        public event Action<MySocket.Server.SocketS> OnServerDown;
-        public event Action<MySocket.Server.SocketS> OnTryUpServerFail;
-        public event Action<Message, SocketC> OnMessageReceived;
+        public event Action<SocketClient> OnClientAccepted;
+        public event Action<SocketClient> OnClientDisconnect;
+        public event Action<MySocket.Server.SocketServer> OnServerUp;
+        public event Action<MySocket.Server.SocketServer> OnServerDown;
+        public event Action<MySocket.Server.SocketServer> OnTryUpServerFail;
+        public event Action<Message, SocketClient> OnMessageReceived;
         public event Action<Exception> OnExceptionReceived;
-        public event Action<ChangeChannelBody, SocketC> OnClientChangeChannel;
+        public event Action<ChangeChannelBody, SocketClient> OnClientChangeChannel;
         #endregion
 
 
@@ -33,12 +33,12 @@ namespace MySocket.Server
 
         #region PUBLIC PROPERTIES
         public string DefaultChannel { get => Configurations.Config.ServerName; }
-        public bool Connected => m_connected();
+        public bool Connected => IsConnected();
 
         #endregion
 
 #pragma warning disable
-        public SocketS(IPEndPoint localEPt)
+        public SocketServer(IPEndPoint localEPt)
         {
 #pragma warning enable
             _tcpListener = new TcpListener(localEPt);
@@ -47,20 +47,20 @@ namespace MySocket.Server
         #region CONNECTION METHODS
         public void Connect()
         {
-            if (m_connected())
+            if (IsConnected())
             {
                 OnServerUp?.Invoke(this);
                 return;
             }
 
-            m_start();
+            Start();
         }
 
         public void Disconnect()
         {
             try
             {
-                if (!m_connected())
+                if (!IsConnected())
                 {
                     OnServerDown?.Invoke(this);
                     return;
@@ -82,7 +82,7 @@ namespace MySocket.Server
 
 
         #region MESSAGE METHODS
-        public void SendMessage(string codMsg, SocketC socket = null)
+        public void SendMessage(string codMsg, SocketClient socket = null)
         {
             try
             {
@@ -101,7 +101,7 @@ namespace MySocket.Server
         #endregion
 
         #region PRIVATE METHODS
-        private void m_start()
+        private void Start()
         {
             try
             {
@@ -111,7 +111,7 @@ namespace MySocket.Server
 
                 MySocket.Channel.Channel.CreateChannel(DefaultChannel, this);
 
-                _thread = new Thread(m_backGWork);
+                _thread = new Thread(BackGroundWork);
 
                 _thread.IsBackground = true;
 
@@ -127,20 +127,20 @@ namespace MySocket.Server
 
         }
 
-        private bool m_connected()
+        private bool IsConnected()
         {
            return _tcpListener.Server.IsBound;
         }
-        private void m_backGWork()
+        private void BackGroundWork()
         {
             while (_isAlive && _keepRunning)
             {
                 try
                 {
-                    SocketC incomming = new SocketC(_tcpListener.AcceptTcpClient());
+                    SocketClient incomming = new SocketClient(_tcpListener.AcceptTcpClient());
 
-                    incomming.OnMessageArriveFromClient += m_OnMessageArriveFromClient;
-                    incomming.OnHandShakeDone += m_OnHandShakeDone;
+                    incomming.OnMessageArriveFromClient += MessageArriveFromClient;
+                    incomming.OnHandShakeDone += HandShakeDone;
                 }
                 catch (Exception ex)
                 {
@@ -150,11 +150,11 @@ namespace MySocket.Server
 
         }
 
-        private void m_OnHandShakeDone(Message msg, SocketC socket)
+        private void HandShakeDone(Message msg, SocketClient socket)
         {
             try
             {
-                if (!m_chekGuid(msg, socket))
+                if (!CheckGUID(msg, socket))
                     return;
             }
             catch (Exception ex)
@@ -164,11 +164,11 @@ namespace MySocket.Server
         }
 
 
-        private void m_OnMessageArriveFromClient(Message codMsg, SocketC socketC)
+        private void MessageArriveFromClient(Message codMsg, SocketClient socketC)
         {
             try
             {
-                if (!m_checkPrivMssg(codMsg, socketC))
+                if (!HandleInternalMessage(codMsg, socketC))
                     return;
 
                 MySocket.Channel.Channel cliChannel = MySocket.Channel.Channel.All.FirstOrDefault(d => d.Contains(socketC));
@@ -186,11 +186,11 @@ namespace MySocket.Server
             }
         }
 
-        private bool m_checkPrivMssg(Message codMsg, SocketC socketC)
+        private bool HandleInternalMessage(Message codMsg, SocketClient socketC)
         {
             if (codMsg.Header == Headers.DISCONNECT)
             {
-                m_discCLi(socketC);
+                DisconnectClient(socketC);
 
                 return false;
             }
@@ -198,7 +198,7 @@ namespace MySocket.Server
             if (codMsg.Header == Headers.CHANGE_CHANNEL)
             {
 
-                m_chgChl(codMsg, socketC);
+                ChangeClientChannel(codMsg, socketC);
 
                 return false;
             }
@@ -206,7 +206,7 @@ namespace MySocket.Server
             if (codMsg.Header == Headers.GET_PARTS_CHANNEL)
             {
 
-                m_sendPesChl(codMsg, socketC);
+                SendChannelParts(codMsg, socketC);
 
                 return false;
             }
@@ -214,7 +214,7 @@ namespace MySocket.Server
             if (codMsg.Header == Headers.GET_ALL_CHANNEL)
             {
 
-                m_sendAllPesChl(codMsg, socketC);
+                SendChannelsInfoMessage(socketC);
 
                 return false;
             }
@@ -222,7 +222,7 @@ namespace MySocket.Server
             if (codMsg.Header == Headers.CUSTOM_EVENT)
             {
 
-                m_emitCEvt(codMsg, socketC);
+                EmitEventOnClient(codMsg, socketC);
 
                 return false;
             }
@@ -232,7 +232,7 @@ namespace MySocket.Server
         }
 
 
-        private void m_emitCEvt(Message msg, SocketC socket)
+        private void EmitEventOnClient(Message msg, SocketClient socket)
         {
 
             MySocket.Channel.Channel ch = MySocket.Channel.Channel.All.Where(d => d.Contains(socket)).FirstOrDefault();
@@ -263,7 +263,7 @@ namespace MySocket.Server
         }
 
 
-        private void m_sendAllPesChl(Message chgN, SocketC socket)
+        private void SendChannelsInfoMessage(SocketClient socket)
         {
             try
             {
@@ -294,7 +294,7 @@ namespace MySocket.Server
 
         }
 
-        private void m_sendPesChl(Message chgN, SocketC socket)
+        private void SendChannelParts(Message chgN, SocketClient socket)
         {
             try
             {
@@ -318,7 +318,7 @@ namespace MySocket.Server
             }
 
         }
-        private void m_chgChl(Message chgN, SocketC socket)
+        private void ChangeClientChannel(Message chgN, SocketClient socket)
         {
             try
             {
@@ -335,7 +335,7 @@ namespace MySocket.Server
 
         }
 
-        private Message m_crtMsg()
+        private Message CreateMessage()
         {
             return new Message
             {
@@ -345,7 +345,7 @@ namespace MySocket.Server
             };
         }
 
-        private void m_discCLi(SocketC socketC)
+        private void DisconnectClient(SocketClient socketC)
         {
             try
             {
@@ -359,7 +359,7 @@ namespace MySocket.Server
             }
         }
 
-        private bool m_chekGuid(Message message, SocketC socketC)
+        private bool CheckGUID(Message message, SocketClient socketC)
         {
             try
             {

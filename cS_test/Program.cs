@@ -14,7 +14,7 @@ namespace cS_test
 
             Console.Title = "Server";
 
-            SocketS server = new SocketS(IPEndPoint.Parse("192.168.1.4:1236"));
+            SocketServer server = new SocketServer(IPEndPoint.Parse("192.168.15.93:1236"));
             
             server.OnClientAccepted += S_OnClientAccepted;
             server.OnMessageReceived += S_OnMessageReceived;
@@ -43,7 +43,7 @@ namespace cS_test
         
         }
 
-        private static void S_OnTryUpServerFail(SocketS obj)
+        private static void S_OnTryUpServerFail(SocketServer obj)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Erro on trying up server");
@@ -52,7 +52,7 @@ namespace cS_test
             Console.WriteLine("Type a command:");
         }
 
-        private static void S_OnServerDown(SocketS obj)
+        private static void S_OnServerDown(SocketServer obj)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Server offline");
@@ -61,7 +61,7 @@ namespace cS_test
             Console.WriteLine("Type a command:");
         }
 
-        private static void S_OnServerUp(SocketS obj)
+        private static void S_OnServerUp(SocketServer obj)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Server online");
@@ -70,28 +70,28 @@ namespace cS_test
             Console.WriteLine("Type a command:");
         }
 
-        private static void S_OnClientChangeChannel(MySocket.Messages.Body.ChangeChannelBody arg1, SocketC arg2)
+        private static void S_OnClientChangeChannel(MySocket.Messages.Body.ChangeChannelBody arg1, SocketClient arg2)
         {
             Console.WriteLine($"Client {arg2.UserName} change {arg1.From} to {arg1.To}");
             Console.WriteLine();
             Console.WriteLine("Type a command:");
         }
 
-        private static void S_OnClientDisconnect(SocketC obj)
+        private static void S_OnClientDisconnect(SocketClient obj)
         {
             Console.WriteLine("Client disconnected: " +  obj.UserName);
             Console.WriteLine();
             Console.WriteLine("Type a command:");
         }
 
-        private static void S_OnMessageReceived(Message arg1, SocketC arg2)
+        private static void S_OnMessageReceived(Message arg1, SocketClient arg2)
         {
             Console.WriteLine("Message: " + arg1);
             Console.WriteLine();
             Console.WriteLine("Type a command:");
         }
 
-        private static void S_OnClientAccepted(SocketC obj)
+        private static void S_OnClientAccepted(SocketClient obj)
         {
             Console.WriteLine($"Client connected: " + obj.UserName);
             Console.WriteLine();

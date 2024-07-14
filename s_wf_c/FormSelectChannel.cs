@@ -3,12 +3,12 @@ using MySocket.Messages.Body;
 
 namespace s_wf_c
 {
-    public partial class Ch_ch : Form
+    public partial class FormSelectChannel : Form
     {
         private RequestChannelsInfoBody _info;
 
         public string Channel { get; set; }
-        public Ch_ch(RequestChannelsInfoBody info)
+        public FormSelectChannel(RequestChannelsInfoBody info)
         {
             InitializeComponent();
 

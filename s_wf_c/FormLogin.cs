@@ -2,11 +2,11 @@
 
 namespace s_wf_c
 {    
-    public partial class Ch_L : Form
+    public partial class FormLogin : Form
     {
-        private SocketC _socket;
+        private SocketClient _socket;
 
-        public Ch_L()
+        public FormLogin()
         {
             InitializeComponent();
         }
@@ -39,7 +39,7 @@ namespace s_wf_c
 
             int port = int.Parse(ports);
 
-            _socket = new SocketC(user);
+            _socket = new SocketClient(user);
             _socket.OnConnected += _socket_OnConnected;
             _socket.OnHandShakeDone += _socket_OnHandShakeDone;
             _socket.OnConnectionFail += _socket_OnConnectionFail;
@@ -49,7 +49,7 @@ namespace s_wf_c
 
         
 
-        private void _socket_OnHandShakeDone(MySocket.Messages.Message arg1, SocketC arg2)
+        private void _socket_OnHandShakeDone(MySocket.Messages.Message arg1, SocketClient arg2)
         {
             this.Hide();
 
@@ -63,7 +63,7 @@ namespace s_wf_c
 
                 this.Invoke(new Action(() =>
                 {
-                    new Ch_c(_socket).Show();
+                    new FormChat(_socket).Show();
 
                 }));
             
@@ -75,7 +75,7 @@ namespace s_wf_c
             lblInfo.Text = "Fail on stablish a connection";
         }
 
-        private void _socket_OnConnected(SocketC obj)
+        private void _socket_OnConnected(SocketClient obj)
         {
             lblInfo.Text = "Connected";
         }

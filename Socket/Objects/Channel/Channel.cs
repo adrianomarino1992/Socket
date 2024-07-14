@@ -10,7 +10,7 @@ namespace MySocket.Channel
 
         public static List<Channel> All { get; set; } = new List<Channel>();
 
-        public static Channel CreateChannel(string name, SocketS server)
+        public static Channel CreateChannel(string name, SocketServer server)
         {
             if (Channel.All.Any(d => d.Name.ToLower().Trim() == name.ToLower().Trim()))
             {
@@ -24,7 +24,7 @@ namespace MySocket.Channel
             return ch;
         }
 
-        public static Channel ChangeChannel(string pre, string chgN, SocketC socket, SocketS server)
+        public static Channel ChangeChannel(string pre, string chgN, SocketClient socket, SocketServer server)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace MySocket.Channel
 
         }
 
-        public static void Disconnect(SocketC socketC)
+        public static void Disconnect(SocketClient socketC)
         {
             if (Channel.ChannelExists(socketC.Channel))
             {
@@ -93,30 +93,30 @@ namespace MySocket.Channel
             }
         }
 
-        private List<SocketC> _clients;
+        private List<SocketClient> _clients;
 
-        public List<SocketC> Participants { get => _clients; }
+        public List<SocketClient> Participants { get => _clients; }
 
-        private SocketS _server;
+        private SocketServer _server;
 
         private string _name;
         public string Name { get => _name; }
 
 #pragma warning disable
-        private Channel(string name, SocketS server)
+        private Channel(string name, SocketServer server)
 #pragma warning enable
         {
             _name = name;
-            _clients = new List<SocketC>();
+            _clients = new List<SocketClient>();
             _server = server;
         }
 
-        public bool Contains(SocketC socket)
+        public bool Contains(SocketClient socket)
         {
             return _clients.Any(d => d.GUID == socket.GUID);
         }
 
-        public SocketC Add(SocketC socket)
+        public SocketClient Add(SocketClient socket)
         {
             if (!_clients.Any(d => d.GUID == socket.GUID))
                 _clients.Add(socket);
@@ -124,7 +124,7 @@ namespace MySocket.Channel
             return socket;
         }
 
-        public void InformNewUserIncomming(SocketC socketC)
+        public void InformNewUserIncomming(SocketClient socketC)
         {
 
             BroadCast(
@@ -138,7 +138,7 @@ namespace MySocket.Channel
                     }, socketC);
         }
 
-        public void InformNewUserLeaving(SocketC socketC)
+        public void InformNewUserLeaving(SocketClient socketC)
         {
 
             BroadCast(
@@ -152,7 +152,7 @@ namespace MySocket.Channel
                     }, socketC);
         }
 
-        public SocketC Remove(SocketC socket)
+        public SocketClient Remove(SocketClient socket)
         {
             if (_clients.Any(d => d.GUID == socket.GUID))
                 _clients.RemoveAll(d => d.GUID == socket.GUID);
@@ -160,12 +160,12 @@ namespace MySocket.Channel
             return socket;
         }
 
-        public void BroadCast(Message codMsg, SocketC sender = null)
+        public void BroadCast(Message codMsg, SocketClient sender = null)
         {
             codMsg.ChannelsParts = _clients.Select(d => new UserDTO { GUID = d.GUID.Trim(), Name = d.UserName }).ToList();
             codMsg.Channel = this.Name;
 
-            List<SocketC> tgts = _clients;
+            List<SocketClient> tgts = _clients;
 
             if(sender != null && !String.IsNullOrEmpty(sender.GUID))
             {
@@ -176,7 +176,7 @@ namespace MySocket.Channel
             if (!String.IsNullOrEmpty(codMsg.TGUID))
                 tgts = _clients.Where(d => d.GUID.Trim() == codMsg.TGUID.Trim()).ToList();
 
-            foreach (SocketC sc in tgts)
+            foreach (SocketClient sc in tgts)
             {
                 if (sc != null && sc.GUID.Trim() != sender.GUID.Trim())
                     sc.SendMessage(codMsg);
@@ -184,7 +184,7 @@ namespace MySocket.Channel
 
         }
 
-        public void BroadCast(string codMsg, SocketC sender = null)
+        public void BroadCast(string codMsg, SocketClient sender = null)
         {
             Message co = new Message
             {
@@ -199,7 +199,7 @@ namespace MySocket.Channel
 
             co.ChannelsParts = _clients.Select(d => new UserDTO { GUID = d.GUID, Name = d.UserName }).ToList();
 
-            foreach (SocketC sc in _clients)
+            foreach (SocketClient sc in _clients)
             {
                 if (sc != null && sc.GUID != sender.GUID)
                 {

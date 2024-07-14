@@ -3,19 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Socket", "Socket\Socket.csproj", "{4C307AD9-97AB-4CE8-9E6C-0B9FF1D05A7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketLib", "Socket\WebSocketLib.csproj", "{4C307AD9-97AB-4CE8-9E6C-0B9FF1D05A7A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cS_test", "cS_test\cS_test.csproj", "{1559DBE2-CAFB-4DDE-8853-846FFCCD10E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleServerSample", "cS_test\ConsoleServerSample.csproj", "{1559DBE2-CAFB-4DDE-8853-846FFCCD10E2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "s_wf_c", "s_wf_c\s_wf_c.csproj", "{33B90CE1-1EEE-4252-A63F-E305F4C28E26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsSample", "s_wf_c\WinFormsSample.csproj", "{33B90CE1-1EEE-4252-A63F-E305F4C28E26}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DA49326C-51AF-4903-9ED2-47DDB3CE78E0}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Readme.MD = Readme.MD
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Remote", "..\Remoto\Remoto\Remote.csproj", "{87AAA23C-C2EF-424E-8A1C-BBE6A0EBF032}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +33,6 @@ Global
 		{33B90CE1-1EEE-4252-A63F-E305F4C28E26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33B90CE1-1EEE-4252-A63F-E305F4C28E26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33B90CE1-1EEE-4252-A63F-E305F4C28E26}.Release|Any CPU.Build.0 = Release|Any CPU
-		{87AAA23C-C2EF-424E-8A1C-BBE6A0EBF032}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{87AAA23C-C2EF-424E-8A1C-BBE6A0EBF032}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{87AAA23C-C2EF-424E-8A1C-BBE6A0EBF032}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{87AAA23C-C2EF-424E-8A1C-BBE6A0EBF032}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

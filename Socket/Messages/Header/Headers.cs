@@ -20,7 +20,7 @@ namespace MySocket.Messages
         public static readonly string USER_LEFT_ROOM = "USELEFTSJHTHWROOMSJJSGFDH36S565AYHGDAS";
         public static readonly string GET_PARTS_CHANNEL = "DSAHJFHGWERRRRRSFGSDGFDH36S565AYHGDAS";
         public static readonly string GET_ALL_CHANNEL = "FFDSJ8877F4D44DF88DFHDHALLFSHGYYYYRTSGS";
-        public static readonly string CUSTOM_EVENT = "DDDDKDUYRTE56W667W66TYWGHGGSFFSVBVDG";
+        public static readonly string CUSTOM_EVENT = "DDDDKDUYRTE56W667W66TYWGHGGSFFSVBVDG";      
         
     }
 }

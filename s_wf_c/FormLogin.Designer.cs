@@ -1,6 +1,6 @@
 ﻿namespace s_wf_c
 {
-    partial class Ch_L
+    partial class FormLogin
     {
         /// <summary>
         /// Required designer variable.
