@@ -37,7 +37,7 @@
             this.lblUser.AutoSize = true;
             this.lblUser.Font = new System.Drawing.Font("Segoe UI Semibold", 9.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lblUser.ForeColor = System.Drawing.Color.Black;
-            this.lblUser.Location = new System.Drawing.Point(13, 4);
+            this.lblUser.Location = new System.Drawing.Point(8, 4);
             this.lblUser.Name = "lblUser";
             this.lblUser.Size = new System.Drawing.Size(56, 17);
             this.lblUser.TabIndex = 3;

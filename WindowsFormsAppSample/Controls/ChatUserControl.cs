@@ -25,7 +25,7 @@ namespace WinFormsSample.Controls
         public void Typing(bool isTyping)
         {
             lblStatus.Visible = isTyping;
-            this.Height = lblUser.Height + 3 + (isTyping ? lblStatus.Height + 3 : 0);
+            this.Height = lblUser.Height + 3 + (isTyping ? lblStatus.Height + 5 : 0);
         }
 
     }

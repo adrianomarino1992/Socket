@@ -56,7 +56,6 @@
             this.txtMsg.Size = new System.Drawing.Size(704, 51);
             this.txtMsg.TabIndex = 2;
             this.txtMsg.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtMsg_KeyDown);
-            this.txtMsg.Leave += new System.EventHandler(this.txtMsg_Leave);
             // 
             // btnSend
             // 
@@ -85,7 +84,6 @@
             // 
             // lblStatus
             // 
-            this.lblStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblStatus.AutoSize = true;
             this.lblStatus.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 9.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lblStatus.ForeColor = System.Drawing.Color.DarkGray;

@@ -87,11 +87,11 @@ namespace WinFormsSample
 
             this.lblStatus.Location = new Point(lblUser.Left + lblUser.Width, lblStatus.Location.Y);
 
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 while (true)
                 {
-                    Thread.Sleep(5000);
+                    await Task.Delay(5000);
 
                     if (_isTyping && _lastKeyPressed.AddSeconds(5) < DateTime.Now)
                     {
@@ -130,12 +130,8 @@ namespace WinFormsSample
 
                 _ = Task.Run(async () =>
                 {
-
                     await Task.Delay(300);
-
-
                     _socket.RequestOthersPartsOfChannel();
-
 
                 });
 
@@ -283,13 +279,20 @@ namespace WinFormsSample
             if (e.KeyCode == Keys.Enter)
             {
                 e.SuppressKeyPress = true;
-                btnSend.PerformClick();
+                _socket.Emit("AlguemParouDeDigitou", "", true);
+                _isTyping = false;
 
-                Task.Run(() =>
+                
+
+                Task.Run(async () =>
                 {
-                    Thread.Sleep(500);
-                    _socket.Emit("AlguemParouDeDigitou", "", true);
-                    _isTyping = false;
+                    await Task.Delay(500);
+
+                    this.Invoke(new Action(() => 
+                    {
+                        btnSend_Click(null, null);
+
+                    }));                    
                 });               
                
 
@@ -396,14 +399,8 @@ namespace WinFormsSample
             e.Control.Width = flowPanelMessages.Width - 25;
             e.Control.Select();
         }
+               
 
-        
-
-        private void txtMsg_Leave(object sender, EventArgs e)
-        {
-            _socket.Emit("AlguemParouDeDigitou", "", true);
-
-        }
 
         private void flowPanelUsers_ControlAdded(object sender, ControlEventArgs e)
         {

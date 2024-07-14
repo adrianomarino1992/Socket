@@ -390,15 +390,50 @@ namespace MySocket.Client
                     if(data.Count > 0)
                     {
                         string msg = System.Text.Encoding.UTF8.GetString(data.ToArray());
+                       
 
-                        Message incomming = Message.ToMessage(msg);
-
-                        OnMessageArriveFromClient?.Invoke(incomming, this);
-
-                        if (HandleInternalMessage(incomming))
+                        if (msg.Contains("}{"))
                         {
-                            OnMessageReceived?.Invoke(incomming, this);
+                            List<Message> messages = new List<Message>();
+
+                             string[] jsons = msg.Split("}{");
+
+                            for(int i = 0; i < jsons.Length; i++)
+                            {
+                                if(i == 0)
+                                    messages.Add(Message.ToMessage(jsons[i] + "}"));
+
+                                else if(i > 0 && i < jsons.Length - 2)
+                                    messages.Add(Message.ToMessage("{" + jsons[i] + "}"));
+
+                                else if(i > 0 && i == jsons.Length - 1)
+                                    messages.Add(Message.ToMessage("{" + jsons[i]));
+
+                            }
+
+                            foreach (Message incomming in messages)
+                            {                                
+                                OnMessageArriveFromClient?.Invoke(incomming, this);
+
+                                if (HandleInternalMessage(incomming))
+                                {
+                                    OnMessageReceived?.Invoke(incomming, this);
+                                }
+                            }
                         }
+                        else
+                        {
+                            Message incomming = Message.ToMessage(msg);
+
+                            OnMessageArriveFromClient?.Invoke(incomming, this);
+
+                            if (HandleInternalMessage(incomming))
+                            {
+                                OnMessageReceived?.Invoke(incomming, this);
+                            }
+                        }
+
+                        
                     }
                 }
                 catch(Exception ex)
