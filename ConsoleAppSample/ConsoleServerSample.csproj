@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Socket\WebSocketLib.csproj" />
+    <ProjectReference Include="..\WebSocketLib\WebSocketLib.csproj" />
   </ItemGroup>
 
 </Project>
