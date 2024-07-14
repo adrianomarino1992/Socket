@@ -8,6 +8,9 @@ namespace WinFormsSample
 {
     public partial class FormChat : Form
     {
+        private DateTime _lastKeyPressed = DateTime.MinValue;
+        private bool _isTyping = false;
+
         private SocketClient _socket;
         public FormChat(SocketClient socket)
         {
@@ -38,9 +41,66 @@ namespace WinFormsSample
             _socket.OnPartsOfChannelUpdated += OnPartsOfChannelUpdatedHandle;
             _socket.OnReceiveChannelsInfo += OnReceiveChannelsInfoHandle;
             _socket.OnReconnected += OnReconnectedHandle;
-            _socket.OnReconnectFail += OnReconnectFailHandle;            
+            _socket.OnReconnectFail += OnReconnectFailHandle;
+
+            _socket.On("AlguemDigitou", msg =>
+            {
+                ExecuteOnMainThread(() =>
+                {
+                    ChatUserControl? user = null;
+                    foreach (var control in flowPanelUsers.Controls)
+                    {
+                        user = control! as ChatUserControl;
+
+                        if (user!.User == msg.From + "#" + msg.FGUID)
+                        {
+                            user.Typing(true);
+                            return;
+                        }
+                    }
+
+                });
+
+            });
+
+            _socket.On("AlguemParouDeDigitou", msg =>
+            {
+                ExecuteOnMainThread(() =>
+                {
+                    ChatUserControl? user = null;
+                    foreach (var control in flowPanelUsers.Controls)
+                    {
+                        user = control! as ChatUserControl;
+
+                        if (user!.User == msg.From + "#" + msg.FGUID)
+                        {
+                            user.Typing(false);
+                            return;
+                        }
+                    }    
+                    
+                });
+
+            });
 
             _socket.RequestOthersPartsOfChannel();
+
+            this.lblStatus.Location = new Point(lblUser.Left + lblUser.Width, lblStatus.Location.Y);
+
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(5000);
+
+                    if (_isTyping && _lastKeyPressed.AddSeconds(5) < DateTime.Now)
+                    {
+                        _isTyping = false;
+                        _socket.Emit("AlguemParouDeDigitou", "", true);
+                    }
+                }
+
+            });
 
         }
 
@@ -88,11 +148,11 @@ namespace WinFormsSample
             {
                 lblChannel.Text = arg2;
 
-                lvlUser.Items.Clear();
+                flowPanelUsers.Controls.Clear();
 
-                foreach (var p in arg1)
+                foreach (var p in arg1.OrderBy(s => s.Name))
                 {
-                    lvlUser.Items.Add($"{p.Name}#{p.GUID}");
+                    flowPanelUsers.Controls.Add(new ChatUserControl(p.Name + "#" + p.GUID));
                 }
             });
 
@@ -110,12 +170,18 @@ namespace WinFormsSample
         {
             ExecuteOnMainThread(() =>
             {
-                lvlUser.Items.Clear();
 
-                foreach (var p in users)
+                ChatUserControl? userToRemove = null;
+                foreach (var control in flowPanelUsers.Controls)
                 {
-                    lvlUser.Items.Add($"{p.Name}#{p.GUID}");
+                    userToRemove = control! as ChatUserControl;
+                    break;
                 }
+
+                if (userToRemove is null)
+                    return;
+
+                flowPanelUsers.Controls.Remove(userToRemove);
 
                 AddMessage("Server", $"{body.Name} left the room", MsgTypes.USERLEFTTHERROM);
 
@@ -126,11 +192,11 @@ namespace WinFormsSample
         {
             ExecuteOnMainThread(() =>
             {
-                lvlUser.Items.Clear();
+                flowPanelUsers.Controls.Clear();
 
-                foreach (var p in users)
+                foreach (var p in users.OrderBy(s => s.Name))
                 {
-                    lvlUser.Items.Add($"{p.Name}#{p.GUID}");
+                    flowPanelUsers.Controls.Add(new ChatUserControl(p.Name + "#" + p.GUID));
                 }
 
                 AddMessage("Server",  $"{body.Name} joined in the room", MsgTypes.USERENTEREDTHEROOM);
@@ -159,13 +225,13 @@ namespace WinFormsSample
         private void OnHandShakeDoneHandle(MySocket.Messages.Message arg1, SocketClient arg2)
         {
             ExecuteOnMainThread(() =>
-            {                
+            {
 
-                lvlUser.Items.Clear();
+                flowPanelUsers.Controls.Clear();
 
-                foreach (var p in arg1.ChannelsParts)
+                foreach (var p in arg1.ChannelsParts.OrderBy(s => s.Name))
                 {
-                    lvlUser.Items.Add($"{p.Name}#{p.GUID}");
+                    flowPanelUsers.Controls.Add(new ChatUserControl(p.Name + "#" + p.GUID));
                 }
             });
         }
@@ -176,7 +242,7 @@ namespace WinFormsSample
             {
                 if (arg1)
                 {
-                    lblStatus.Text = $"Ok : {arg2.ToString()}";
+                    lblStatus.Text = $"Connected";
                     lblStatus.ForeColor = Color.DarkOliveGreen;
                 }
                 else
@@ -205,57 +271,38 @@ namespace WinFormsSample
             if (String.IsNullOrEmpty(txtMsg.Text.Trim()))
                 return;
 
-            string uid = GetUID();
-            if(String.IsNullOrEmpty(uid) && uid != lblUser.Text.Split('#')[1])
-            {
-                AddMessage("You", txtMsg.Text.Trim(), MsgTypes.FROMTHISUSER);
-                _socket.SendMessage(txtMsg.Text);
-            }
-            else
-            {
-                AddMessage("You", $"Private to {GetUserFromGUID(uid)}: {txtMsg.Text.Trim()}", MsgTypes.PRIVATE);
-                _socket.SendMessageTo(txtMsg.Text, uid);
-            }
-
-            
+            AddMessage("You", txtMsg.Text.Trim(), MsgTypes.FROMTHISUSER);
+            _socket.SendMessage(txtMsg.Text);
 
             txtMsg.Text = String.Empty;
         }
 
-        private string GetUserFromGUID(string uid)
-        {
-            foreach (string u in lvlUser.Items)
-            {
-                if (u.Split('#')[1] ==uid)
-                {
-                    return u.Split('#')[0];
-                }
-            }
-            return String.Empty;
-        }
-
-        private string GetUID()
-        {
-            if(txtMsg.Text.Length > 8)
-            {
-                foreach(string u in lvlUser.Items)
-                {
-                    if(u.Split('#')[1] == txtMsg.Text.Substring(1, 5))
-                    {
-                        string uid = txtMsg.Text.Substring(1, 5);
-                        txtMsg.Text = txtMsg.Text.Substring(7);
-                        return uid;
-                    }
-                }
-            }
-            return String.Empty;
-        }
+       
         private void txtMsg_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
                 e.SuppressKeyPress = true;
                 btnSend.PerformClick();
+
+                Task.Run(() =>
+                {
+                    Thread.Sleep(500);
+                    _socket.Emit("AlguemParouDeDigitou", "", true);
+                    _isTyping = false;
+                });               
+               
+
+            }
+            else
+            {
+                _lastKeyPressed = DateTime.Now;
+
+                if (!_isTyping)
+                {
+                    _socket.Emit("AlguemDigitou", "", true);
+                    _isTyping = true;
+                }
             }
         }
 
@@ -276,14 +323,7 @@ namespace WinFormsSample
             _socket.RequestAllChannels();
         }
 
-        private void lvlUser_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                txtMsg.Text = $"#{lvlUser.SelectedItem?.ToString()?.Split('#')[1]}:";
-            }
-            catch { }
-        }
+        
 
         private void AddMessage(string user, string msg, MsgTypes type)
         {
@@ -355,6 +395,21 @@ namespace WinFormsSample
         {
             e.Control.Width = flowPanelMessages.Width - 25;
             e.Control.Select();
+        }
+
+        
+
+        private void txtMsg_Leave(object sender, EventArgs e)
+        {
+            _socket.Emit("AlguemParouDeDigitou", "", true);
+
+        }
+
+        private void flowPanelUsers_ControlAdded(object sender, ControlEventArgs e)
+        {
+            e.Control.Width = flowPanelUsers.Width - 25;
+            e.Control.Margin = new Padding(0);
+            
         }
     }
 }

@@ -236,7 +236,7 @@ namespace MySocket.Client
         #region PUBLIC METHODS
 
 
-        public void On(string @event, Action<Message> action, bool @continue = true, bool @onlyFromserver = true)
+        public void On(string @event, Action<Message> action, bool @continue = false, bool @onlyFromserver = false)
         {            
             _events.Add(new Event(@event, action, @continue, !onlyFromserver));
         }
@@ -391,11 +391,13 @@ namespace MySocket.Client
                     {
                         string msg = System.Text.Encoding.UTF8.GetString(data.ToArray());
 
-                        OnMessageArriveFromClient?.Invoke(Message.ToMessage(msg), this);
+                        Message incomming = Message.ToMessage(msg);
 
-                        if (HandleInternalMessage(Message.ToMessage(msg)))
+                        OnMessageArriveFromClient?.Invoke(incomming, this);
+
+                        if (HandleInternalMessage(incomming))
                         {
-                            OnMessageReceived?.Invoke(Message.ToMessage(msg), this);
+                            OnMessageReceived?.Invoke(incomming, this);
                         }
                     }
                 }

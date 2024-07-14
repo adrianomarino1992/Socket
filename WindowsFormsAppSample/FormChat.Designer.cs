@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormChat));
-            this.lvlUser = new System.Windows.Forms.ListBox();
             this.txtMsg = new System.Windows.Forms.TextBox();
             this.btnSend = new System.Windows.Forms.Button();
             this.lblChannel = new System.Windows.Forms.Label();
@@ -38,24 +37,10 @@
             this.flowPanelMessages = new System.Windows.Forms.FlowLayoutPanel();
             this.lblUser = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.flowPanelUsers = new System.Windows.Forms.FlowLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.btnRequestChannels)).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // lvlUser
-            // 
-            this.lvlUser.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvlUser.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(250)))), ((int)(((byte)(250)))));
-            this.lvlUser.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.lvlUser.FormattingEnabled = true;
-            this.lvlUser.ItemHeight = 18;
-            this.lvlUser.Location = new System.Drawing.Point(726, 53);
-            this.lvlUser.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.lvlUser.Name = "lvlUser";
-            this.lvlUser.Size = new System.Drawing.Size(163, 378);
-            this.lvlUser.TabIndex = 1;
-            this.lvlUser.Click += new System.EventHandler(this.lvlUser_Click);
             // 
             // txtMsg
             // 
@@ -63,7 +48,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtMsg.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(250)))), ((int)(((byte)(250)))));
             this.txtMsg.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtMsg.Location = new System.Drawing.Point(16, 437);
+            this.txtMsg.Location = new System.Drawing.Point(16, 464);
             this.txtMsg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtMsg.Multiline = true;
             this.txtMsg.Name = "txtMsg";
@@ -71,6 +56,7 @@
             this.txtMsg.Size = new System.Drawing.Size(704, 51);
             this.txtMsg.TabIndex = 2;
             this.txtMsg.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtMsg_KeyDown);
+            this.txtMsg.Leave += new System.EventHandler(this.txtMsg_Leave);
             // 
             // btnSend
             // 
@@ -78,7 +64,7 @@
             this.btnSend.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.btnSend.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSend.ForeColor = System.Drawing.Color.White;
-            this.btnSend.Location = new System.Drawing.Point(726, 439);
+            this.btnSend.Location = new System.Drawing.Point(726, 466);
             this.btnSend.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(163, 50);
@@ -103,7 +89,7 @@
             this.lblStatus.AutoSize = true;
             this.lblStatus.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 9.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lblStatus.ForeColor = System.Drawing.Color.DarkGray;
-            this.lblStatus.Location = new System.Drawing.Point(10, 494);
+            this.lblStatus.Location = new System.Drawing.Point(125, 19);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(103, 16);
             this.lblStatus.TabIndex = 6;
@@ -134,7 +120,7 @@
             this.flowPanelMessages.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowPanelMessages.Location = new System.Drawing.Point(18, 48);
             this.flowPanelMessages.Name = "flowPanelMessages";
-            this.flowPanelMessages.Size = new System.Drawing.Size(702, 383);
+            this.flowPanelMessages.Size = new System.Drawing.Size(702, 409);
             this.flowPanelMessages.TabIndex = 8;
             this.flowPanelMessages.WrapContents = false;
             this.flowPanelMessages.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.flowPanelMessages_ControlAdded);
@@ -151,10 +137,10 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
+            this.panel1.Controls.Add(this.flowPanelUsers);
             this.panel1.Controls.Add(this.lblUser);
             this.panel1.Controls.Add(this.lblStatus);
             this.panel1.Controls.Add(this.flowPanelMessages);
-            this.panel1.Controls.Add(this.lvlUser);
             this.panel1.Controls.Add(this.btnRequestChannels);
             this.panel1.Controls.Add(this.txtMsg);
             this.panel1.Controls.Add(this.btnSend);
@@ -164,6 +150,21 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(901, 521);
             this.panel1.TabIndex = 9;
+            // 
+            // flowPanelUsers
+            // 
+            this.flowPanelUsers.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.flowPanelUsers.AutoScroll = true;
+            this.flowPanelUsers.BackColor = System.Drawing.Color.White;
+            this.flowPanelUsers.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flowPanelUsers.Location = new System.Drawing.Point(726, 48);
+            this.flowPanelUsers.Margin = new System.Windows.Forms.Padding(0);
+            this.flowPanelUsers.Name = "flowPanelUsers";
+            this.flowPanelUsers.Size = new System.Drawing.Size(163, 406);
+            this.flowPanelUsers.TabIndex = 9;
+            this.flowPanelUsers.WrapContents = false;
+            this.flowPanelUsers.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.flowPanelUsers_ControlAdded);
             // 
             // FormChat
             // 
@@ -187,7 +188,6 @@
         }
 
         #endregion
-        private ListBox lvlUser;
         private TextBox txtMsg;
         private Button btnSend;
         private Label lblChannel;
@@ -196,5 +196,6 @@
         private FlowLayoutPanel flowPanelMessages;
         private Label lblUser;
         private Panel panel1;
+        private FlowLayoutPanel flowPanelUsers;
     }
 }
