@@ -267,10 +267,25 @@ namespace WinFormsSample
             if (String.IsNullOrEmpty(txtMsg.Text.Trim()))
                 return;
 
-            AddMessage("You", txtMsg.Text.Trim(), MsgTypes.FROMTHISUSER);
-            _socket.SendMessage(txtMsg.Text);
+            _socket.Emit("AlguemParouDeDigitou", "", true);
+            _isTyping = false;
 
-            txtMsg.Text = String.Empty;
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(500);
+
+                this.Invoke(new Action(() =>
+                {
+                    AddMessage("You", txtMsg.Text.Trim(), MsgTypes.FROMTHISUSER);
+                    _socket.SendMessage(txtMsg.Text);
+
+                    txtMsg.Text = String.Empty;
+
+                }));
+            });
+
+            
         }
 
        
@@ -279,22 +294,8 @@ namespace WinFormsSample
             if (e.KeyCode == Keys.Enter)
             {
                 e.SuppressKeyPress = true;
-                _socket.Emit("AlguemParouDeDigitou", "", true);
-                _isTyping = false;
 
-                
-
-                Task.Run(async () =>
-                {
-                    await Task.Delay(500);
-
-                    this.Invoke(new Action(() => 
-                    {
-                        btnSend_Click(null, null);
-
-                    }));                    
-                });               
-               
+                btnSend_Click(null, null);                
 
             }
             else

@@ -79,5 +79,12 @@ namespace WinFormsSample
         {
             lblInfo.Text = "Connected";
         }
+
+        private void FormLogin_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        
     }
 }

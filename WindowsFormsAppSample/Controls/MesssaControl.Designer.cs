@@ -67,19 +67,20 @@
             this.txtMessage.Multiline = true;
             this.txtMessage.Name = "txtMessage";
             this.txtMessage.ReadOnly = true;
-            this.txtMessage.Size = new System.Drawing.Size(575, 31);
+            this.txtMessage.Size = new System.Drawing.Size(63, 31);
             this.txtMessage.TabIndex = 2;
             // 
             // MessageControl
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.AutoSize = true;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.Controls.Add(this.txtMessage);
             this.Controls.Add(this.lblUser);
             this.Controls.Add(this.lblHour);
             this.Name = "MessageControl";
-            this.Size = new System.Drawing.Size(615, 69);
+            this.Size = new System.Drawing.Size(100, 69);
             this.ResumeLayout(false);
             this.PerformLayout();
 

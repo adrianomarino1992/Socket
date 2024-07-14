@@ -48,12 +48,12 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtMsg.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(250)))), ((int)(((byte)(250)))));
             this.txtMsg.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtMsg.Location = new System.Drawing.Point(16, 464);
+            this.txtMsg.Location = new System.Drawing.Point(16, 305);
             this.txtMsg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtMsg.Multiline = true;
             this.txtMsg.Name = "txtMsg";
             this.txtMsg.PlaceholderText = "...";
-            this.txtMsg.Size = new System.Drawing.Size(704, 51);
+            this.txtMsg.Size = new System.Drawing.Size(392, 51);
             this.txtMsg.TabIndex = 2;
             this.txtMsg.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtMsg_KeyDown);
             // 
@@ -61,9 +61,10 @@
             // 
             this.btnSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSend.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.btnSend.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnSend.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSend.ForeColor = System.Drawing.Color.White;
-            this.btnSend.Location = new System.Drawing.Point(726, 466);
+            this.btnSend.Location = new System.Drawing.Point(414, 307);
             this.btnSend.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(163, 50);
@@ -76,7 +77,7 @@
             // 
             this.lblChannel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblChannel.AutoSize = true;
-            this.lblChannel.Location = new System.Drawing.Point(726, 19);
+            this.lblChannel.Location = new System.Drawing.Point(414, 19);
             this.lblChannel.Name = "lblChannel";
             this.lblChannel.Size = new System.Drawing.Size(47, 18);
             this.lblChannel.TabIndex = 5;
@@ -96,10 +97,10 @@
             // btnRequestChannels
             // 
             this.btnRequestChannels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRequestChannels.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.btnRequestChannels.BackColor = System.Drawing.SystemColors.InfoText;
             this.btnRequestChannels.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnRequestChannels.Image = ((System.Drawing.Image)(resources.GetObject("btnRequestChannels.Image")));
-            this.btnRequestChannels.Location = new System.Drawing.Point(865, 17);
+            this.btnRequestChannels.Location = new System.Drawing.Point(553, 17);
             this.btnRequestChannels.Name = "btnRequestChannels";
             this.btnRequestChannels.Padding = new System.Windows.Forms.Padding(4);
             this.btnRequestChannels.Size = new System.Drawing.Size(22, 22);
@@ -118,7 +119,7 @@
             this.flowPanelMessages.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowPanelMessages.Location = new System.Drawing.Point(18, 48);
             this.flowPanelMessages.Name = "flowPanelMessages";
-            this.flowPanelMessages.Size = new System.Drawing.Size(702, 409);
+            this.flowPanelMessages.Size = new System.Drawing.Size(390, 250);
             this.flowPanelMessages.TabIndex = 8;
             this.flowPanelMessages.WrapContents = false;
             this.flowPanelMessages.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.flowPanelMessages_ControlAdded);
@@ -146,7 +147,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(10, 10);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(901, 521);
+            this.panel1.Size = new System.Drawing.Size(589, 362);
             this.panel1.TabIndex = 9;
             // 
             // flowPanelUsers
@@ -156,10 +157,10 @@
             this.flowPanelUsers.AutoScroll = true;
             this.flowPanelUsers.BackColor = System.Drawing.Color.White;
             this.flowPanelUsers.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.flowPanelUsers.Location = new System.Drawing.Point(726, 48);
+            this.flowPanelUsers.Location = new System.Drawing.Point(414, 48);
             this.flowPanelUsers.Margin = new System.Windows.Forms.Padding(0);
             this.flowPanelUsers.Name = "flowPanelUsers";
-            this.flowPanelUsers.Size = new System.Drawing.Size(163, 406);
+            this.flowPanelUsers.Size = new System.Drawing.Size(163, 250);
             this.flowPanelUsers.TabIndex = 9;
             this.flowPanelUsers.WrapContents = false;
             this.flowPanelUsers.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.flowPanelUsers_ControlAdded);
@@ -168,13 +169,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.Gainsboro;
-            this.ClientSize = new System.Drawing.Size(921, 541);
+            this.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.ClientSize = new System.Drawing.Size(609, 382);
             this.Controls.Add(this.panel1);
             this.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.MinimumSize = new System.Drawing.Size(937, 580);
             this.Name = "FormChat";
             this.Padding = new System.Windows.Forms.Padding(10);
             this.Text = "Chat";

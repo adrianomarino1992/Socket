@@ -29,34 +29,22 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.btnConnect = new System.Windows.Forms.Button();
             this.txtPort = new System.Windows.Forms.TextBox();
             this.txtUser = new System.Windows.Forms.TextBox();
             this.txtHost = new System.Windows.Forms.TextBox();
             this.errorProvider = new System.Windows.Forms.ErrorProvider(this.components);
             this.lblInfo = new System.Windows.Forms.Label();
+            this.btnConnect = new System.Windows.Forms.Button();
+            this.pnlContainer = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider)).BeginInit();
+            this.pnlContainer.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // btnConnect
-            // 
-            this.btnConnect.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.btnConnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnConnect.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnConnect.Location = new System.Drawing.Point(27, 103);
-            this.btnConnect.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(189, 47);
-            this.btnConnect.TabIndex = 9;
-            this.btnConnect.Text = "Connect";
-            this.btnConnect.UseVisualStyleBackColor = false;
-            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
             // 
             // txtPort
             // 
             this.txtPort.BackColor = System.Drawing.Color.White;
             this.txtPort.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.txtPort.Location = new System.Drawing.Point(154, 34);
+            this.txtPort.Location = new System.Drawing.Point(143, 19);
             this.txtPort.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtPort.Name = "txtPort";
             this.txtPort.PlaceholderText = "1236";
@@ -67,7 +55,7 @@
             // 
             this.txtUser.BackColor = System.Drawing.Color.White;
             this.txtUser.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.txtUser.Location = new System.Drawing.Point(27, 68);
+            this.txtUser.Location = new System.Drawing.Point(16, 53);
             this.txtUser.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtUser.Name = "txtUser";
             this.txtUser.PlaceholderText = "test 1";
@@ -78,7 +66,7 @@
             // 
             this.txtHost.BackColor = System.Drawing.Color.White;
             this.txtHost.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.txtHost.Location = new System.Drawing.Point(27, 34);
+            this.txtHost.Location = new System.Drawing.Point(16, 19);
             this.txtHost.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtHost.Name = "txtHost";
             this.txtHost.PlaceholderText = "192.168.15.93";
@@ -97,17 +85,41 @@
             this.lblInfo.Size = new System.Drawing.Size(189, 24);
             this.lblInfo.TabIndex = 10;
             // 
+            // btnConnect
+            // 
+            this.btnConnect.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.btnConnect.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnConnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConnect.ForeColor = System.Drawing.Color.White;
+            this.btnConnect.Location = new System.Drawing.Point(16, 87);
+            this.btnConnect.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnConnect.Name = "btnConnect";
+            this.btnConnect.Size = new System.Drawing.Size(189, 39);
+            this.btnConnect.TabIndex = 12;
+            this.btnConnect.Text = "Join";
+            this.btnConnect.UseVisualStyleBackColor = false;
+            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
+            // 
+            // pnlContainer
+            // 
+            this.pnlContainer.BackColor = System.Drawing.Color.White;
+            this.pnlContainer.Controls.Add(this.txtHost);
+            this.pnlContainer.Controls.Add(this.btnConnect);
+            this.pnlContainer.Controls.Add(this.txtUser);
+            this.pnlContainer.Controls.Add(this.txtPort);
+            this.pnlContainer.Location = new System.Drawing.Point(7, 7);
+            this.pnlContainer.Name = "pnlContainer";
+            this.pnlContainer.Size = new System.Drawing.Size(223, 147);
+            this.pnlContainer.TabIndex = 13;
+            // 
             // FormLogin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(240, 179);
+            this.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.ClientSize = new System.Drawing.Size(239, 163);
+            this.Controls.Add(this.pnlContainer);
             this.Controls.Add(this.lblInfo);
-            this.Controls.Add(this.btnConnect);
-            this.Controls.Add(this.txtPort);
-            this.Controls.Add(this.txtUser);
-            this.Controls.Add(this.txtHost);
             this.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -117,18 +129,19 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Login";
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider)).EndInit();
+            this.pnlContainer.ResumeLayout(false);
+            this.pnlContainer.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
-
-        private Button btnConnect;
         private TextBox txtPort;
         private TextBox txtUser;
         private TextBox txtHost;
         private ErrorProvider errorProvider;
         private Label lblInfo;
+        private Button btnConnect;
+        private Panel pnlContainer;
     }
 }
