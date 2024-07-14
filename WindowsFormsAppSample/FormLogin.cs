@@ -1,6 +1,6 @@
 ﻿using MySocket.Client;
 
-namespace s_wf_c
+namespace WinFormsSample
 {    
     public partial class FormLogin : Form
     {

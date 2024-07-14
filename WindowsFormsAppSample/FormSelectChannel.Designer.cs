@@ -1,4 +1,4 @@
-﻿namespace s_wf_c
+﻿namespace WinFormsSample
 {
     partial class FormSelectChannel
     {
@@ -47,7 +47,8 @@
             // btnJoin
             // 
             this.btnJoin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnJoin.BackColor = System.Drawing.Color.DeepSkyBlue;
+            this.btnJoin.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.btnJoin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnJoin.ForeColor = System.Drawing.Color.White;
             this.btnJoin.Location = new System.Drawing.Point(322, 361);
             this.btnJoin.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -61,7 +62,8 @@
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.BackColor = System.Drawing.Color.DeepSkyBlue;
+            this.btnCancel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.ForeColor = System.Drawing.Color.White;
             this.btnCancel.Location = new System.Drawing.Point(153, 361);
             this.btnCancel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -85,7 +87,7 @@
             this.lstChannels.View = System.Windows.Forms.View.List;
             this.lstChannels.SelectedIndexChanged += new System.EventHandler(this.lstChannels_SelectedIndexChanged);
             // 
-            // Ch_ch
+            // FormSelectChannel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -96,7 +98,7 @@
             this.Controls.Add(this.txtCreate);
             this.Font = new System.Drawing.Font("Bahnschrift SemiLight Condensed", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.Name = "Ch_ch";
+            this.Name = "FormSelectChannel";
             this.Text = "Ch_ch";
             this.ResumeLayout(false);
             this.PerformLayout();

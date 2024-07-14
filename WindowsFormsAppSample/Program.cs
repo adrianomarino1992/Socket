@@ -1,4 +1,4 @@
-namespace s_wf_c
+namespace WinFormsSample
 {
     internal static class Program
     {

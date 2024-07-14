@@ -1,4 +1,4 @@
-﻿namespace s_wf_c
+﻿namespace WinFormsSample
 {
     partial class FormLogin
     {
@@ -40,7 +40,8 @@
             // 
             // btnConnect
             // 
-            this.btnConnect.BackColor = System.Drawing.Color.DeepSkyBlue;
+            this.btnConnect.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.btnConnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnConnect.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.btnConnect.Location = new System.Drawing.Point(27, 103);
             this.btnConnect.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);

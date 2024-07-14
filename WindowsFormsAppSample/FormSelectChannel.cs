@@ -1,7 +1,7 @@
 ﻿using MySocket.DTO;
 using MySocket.Messages.Body;
 
-namespace s_wf_c
+namespace WinFormsSample
 {
     public partial class FormSelectChannel : Form
     {

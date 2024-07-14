@@ -1,9 +1,10 @@
 using MySocket.Client;
 using MySocket.DTO;
 using System.ComponentModel;
+using global::WinFormsSample.Controls;
 
 
-namespace s_wf_c
+namespace WinFormsSample
 {
     public partial class FormChat : Form
     {
@@ -18,7 +19,7 @@ namespace s_wf_c
         {
             base.OnResize(e);
 
-            lvMsg.Columns[0].Width = lvMsg.Width - 4;
+            
         }
 
         protected override void OnShown(EventArgs e)
@@ -116,7 +117,7 @@ namespace s_wf_c
                     lvlUser.Items.Add($"{p.Name}#{p.GUID}");
                 }
 
-                AddMessage($"{body.Name} left the room", $"Left in {DateTime.Now}", MsgTypes.USERLEFTTHERROM);
+                AddMessage("Server", $"{body.Name} left the room", MsgTypes.USERLEFTTHERROM);
 
             });
         }
@@ -132,7 +133,7 @@ namespace s_wf_c
                     lvlUser.Items.Add($"{p.Name}#{p.GUID}");
                 }
 
-                AddMessage($"{body.Name} joined in the room", $"Joined in {DateTime.Now}", MsgTypes.USERENTEREDTHEROOM);
+                AddMessage("Server",  $"{body.Name} joined in the room", MsgTypes.USERENTEREDTHEROOM);
             });
         }
 
@@ -142,11 +143,11 @@ namespace s_wf_c
             {
                 if(arg1.TGUID == lblUser.Text.Split('#')[1])
                 {
-                    AddMessage($"Private from {arg1.From}: {arg1.Body}", $"Received in {DateTime.Now}", MsgTypes.PRIVATE);
+                    AddMessage(arg1.From, arg1.Body, MsgTypes.PRIVATE);
                 }
                 else {
 
-                    AddMessage($"{arg1.From}: {arg1.Body}", $"Received in {DateTime.Now}", MsgTypes.FROMOTHERUSER);
+                    AddMessage(arg1.From, arg1.Body, MsgTypes.FROMOTHERUSER);
                 }
 
 
@@ -192,7 +193,7 @@ namespace s_wf_c
         {
             ExecuteOnMainThread(() =>
             {
-                lvMsg.Items.Clear();
+                flowPanelMessages.Controls.Clear();
                 AddMessage($"Changed to channel: {arg1.Channel}", $"Changed in {DateTime.Now}", MsgTypes.CHANGECHANNEL);
                 
                 lblChannel.Text = arg1.Channel;
@@ -207,12 +208,12 @@ namespace s_wf_c
             string uid = GetUID();
             if(String.IsNullOrEmpty(uid) && uid != lblUser.Text.Split('#')[1])
             {
-                AddMessage($"You: {txtMsg.Text.Trim()}", $"Sent in {DateTime.Now}", MsgTypes.FROMTHISUSER);
+                AddMessage("You", txtMsg.Text.Trim(), MsgTypes.FROMTHISUSER);
                 _socket.SendMessage(txtMsg.Text);
             }
             else
             {
-                AddMessage($"Private to {GetUserFromGUID(uid)}: {txtMsg.Text.Trim()}", $"Sent in {DateTime.Now}", MsgTypes.PRIVATE);
+                AddMessage("You", $"Private to {GetUserFromGUID(uid)}: {txtMsg.Text.Trim()}", MsgTypes.PRIVATE);
                 _socket.SendMessageTo(txtMsg.Text, uid);
             }
 
@@ -284,55 +285,57 @@ namespace s_wf_c
             catch { }
         }
 
-        private void AddMessage(string msg, string tooltip, MsgTypes type)
+        private void AddMessage(string user, string msg, MsgTypes type)
         {
             Color colorB = Color.White;
             Color colorF = Color.Black;
             switch (type)
             {
                 case MsgTypes.DEFAULT: { 
-                        colorB = Color.FromArgb(1, 250, 242, 225); 
-                        colorF = Color.FromArgb(1, 41, 41, 40); 
+                        colorB = Color.FromArgb(250, 242, 225); 
+                        colorF = Color.FromArgb(41, 41, 40); 
                     } break;
                 case MsgTypes.PRIVATE:
                     {
-                        colorB = Color.FromArgb(1, 130, 15, 3);
-                        colorF = Color.FromArgb(1, 247, 247, 245);
+                        colorB = Color.FromArgb(130, 15, 3);
+                        colorF = Color.FromArgb(247, 247, 245);
                     }
                     break;
                 case MsgTypes.FROMTHISUSER:
                     {
-                        colorB = Color.FromArgb(1, 232, 255, 252);
-                        colorF = Color.FromArgb(1, 41, 41, 40);
+                        colorB = Color.FromArgb(232, 255, 252);
+                        colorF = Color.FromArgb(41, 41, 40);
                     }
                     break;
                 case MsgTypes.FROMOTHERUSER:
                     {
-                        colorB = Color.FromArgb(1, 250, 242, 225);
-                        colorF = Color.FromArgb(1, 41, 41, 40);
+                        colorB = Color.FromArgb(250, 242, 225);
+                        colorF = Color.FromArgb(41, 41, 40);
                     }
                     break;
                 case MsgTypes.CHANGECHANNEL:
                     {
-                        colorB = Color.FromArgb(1, 61, 61, 61);
-                        colorF = Color.FromArgb(1, 250, 250, 250);
+                        colorB = Color.FromArgb(61, 61, 61);
+                        colorF = Color.FromArgb(250, 250, 250);
                     }
                     break;
                 case MsgTypes.USERENTEREDTHEROOM:
                     {
-                        colorB = Color.FromArgb(1, 245, 244, 213);
-                        colorF = Color.FromArgb(1, 41, 41, 40);
+                        colorB = Color.FromArgb(245, 244, 213);
+                        colorF = Color.FromArgb(41, 41, 40);
                     }
                     break;
                 case MsgTypes.USERLEFTTHERROM:
                     {
-                        colorB = Color.FromArgb(1, 245, 244, 213);
-                        colorF = Color.FromArgb(1, 41, 41, 40);
+                        colorB = Color.FromArgb(245, 244, 213);
+                        colorF = Color.FromArgb(41, 41, 40);
                     }
                     break;
             }
 
-            lvMsg.Items.Add(new ListViewItem { Text = $"{DateTime.Now.ToShortTimeString()} - " +  msg, BackColor = colorB, ForeColor = colorF, ToolTipText = tooltip }).Focused = true;
+            flowPanelMessages.Controls.Add(new MessageControl(user, DateTime.Now.ToShortTimeString(), msg, colorF, colorB) { Dock = DockStyle.Top});
+
+            
 
         }
 
@@ -347,6 +350,11 @@ namespace s_wf_c
             USERLEFTTHERROM
             
         }
-       
+
+        private void flowPanelMessages_ControlAdded(object sender, ControlEventArgs e)
+        {
+            e.Control.Width = flowPanelMessages.Width - 25;
+            e.Control.Select();
+        }
     }
 }
